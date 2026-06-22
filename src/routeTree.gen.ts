@@ -12,11 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as PreviewRouteImport } from './routes/preview'
+import { Route as PaperRouteImport } from './routes/paper'
+import { Route as PagesRouteImport } from './routes/pages'
+import { Route as MaterialRouteImport } from './routes/material'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DestinationRouteImport } from './routes/destination'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as CraftingRouteImport } from './routes/crafting'
+import { Route as CoverRouteImport } from './routes/cover'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AccountRouteImport } from './routes/account'
@@ -49,6 +53,21 @@ const PreviewRoute = PreviewRouteImport.update({
   path: '/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaperRoute = PaperRouteImport.update({
+  id: '/paper',
+  path: '/paper',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagesRoute = PagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialRoute = MaterialRouteImport.update({
+  id: '/material',
+  path: '/material',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -72,6 +91,11 @@ const CreateRoute = CreateRouteImport.update({
 const CraftingRoute = CraftingRouteImport.update({
   id: '/crafting',
   path: '/crafting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoverRoute = CoverRouteImport.update({
+  id: '/cover',
+  path: '/cover',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -161,11 +185,15 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cover': typeof CoverRoute
   '/crafting': typeof CraftingRoute
   '/create': typeof CreateRoute
   '/destination': typeof DestinationRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
+  '/material': typeof MaterialRoute
+  '/pages': typeof PagesRoute
+  '/paper': typeof PaperRoute
   '/preview': typeof PreviewRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
@@ -186,11 +214,15 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cover': typeof CoverRoute
   '/crafting': typeof CraftingRoute
   '/create': typeof CreateRoute
   '/destination': typeof DestinationRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
+  '/material': typeof MaterialRoute
+  '/pages': typeof PagesRoute
+  '/paper': typeof PaperRoute
   '/preview': typeof PreviewRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
@@ -212,11 +244,15 @@ export interface FileRoutesById {
   '/account': typeof AccountRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cover': typeof CoverRoute
   '/crafting': typeof CraftingRoute
   '/create': typeof CreateRoute
   '/destination': typeof DestinationRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
+  '/material': typeof MaterialRoute
+  '/pages': typeof PagesRoute
+  '/paper': typeof PaperRoute
   '/preview': typeof PreviewRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
@@ -240,11 +276,15 @@ export interface FileRouteTypes {
     | '/account'
     | '/checkout'
     | '/contact'
+    | '/cover'
     | '/crafting'
     | '/create'
     | '/destination'
     | '/explore'
     | '/faq'
+    | '/material'
+    | '/pages'
+    | '/paper'
     | '/preview'
     | '/success'
     | '/upload'
@@ -265,11 +305,15 @@ export interface FileRouteTypes {
     | '/about'
     | '/checkout'
     | '/contact'
+    | '/cover'
     | '/crafting'
     | '/create'
     | '/destination'
     | '/explore'
     | '/faq'
+    | '/material'
+    | '/pages'
+    | '/paper'
     | '/preview'
     | '/success'
     | '/upload'
@@ -290,11 +334,15 @@ export interface FileRouteTypes {
     | '/account'
     | '/checkout'
     | '/contact'
+    | '/cover'
     | '/crafting'
     | '/create'
     | '/destination'
     | '/explore'
     | '/faq'
+    | '/material'
+    | '/pages'
+    | '/paper'
     | '/preview'
     | '/success'
     | '/upload'
@@ -317,11 +365,15 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  CoverRoute: typeof CoverRoute
   CraftingRoute: typeof CraftingRoute
   CreateRoute: typeof CreateRoute
   DestinationRoute: typeof DestinationRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
+  MaterialRoute: typeof MaterialRoute
+  PagesRoute: typeof PagesRoute
+  PaperRoute: typeof PaperRoute
   PreviewRoute: typeof PreviewRoute
   SuccessRoute: typeof SuccessRoute
   UploadRoute: typeof UploadRoute
@@ -353,6 +405,27 @@ declare module '@tanstack/react-router' {
       path: '/preview'
       fullPath: '/preview'
       preLoaderRoute: typeof PreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paper': {
+      id: '/paper'
+      path: '/paper'
+      fullPath: '/paper'
+      preLoaderRoute: typeof PaperRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pages': {
+      id: '/pages'
+      path: '/pages'
+      fullPath: '/pages'
+      preLoaderRoute: typeof PagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/material': {
+      id: '/material'
+      path: '/material'
+      fullPath: '/material'
+      preLoaderRoute: typeof MaterialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -388,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/crafting'
       fullPath: '/crafting'
       preLoaderRoute: typeof CraftingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cover': {
+      id: '/cover'
+      path: '/cover'
+      fullPath: '/cover'
+      preLoaderRoute: typeof CoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -542,11 +622,15 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  CoverRoute: CoverRoute,
   CraftingRoute: CraftingRoute,
   CreateRoute: CreateRoute,
   DestinationRoute: DestinationRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
+  MaterialRoute: MaterialRoute,
+  PagesRoute: PagesRoute,
+  PaperRoute: PaperRoute,
   PreviewRoute: PreviewRoute,
   SuccessRoute: SuccessRoute,
   UploadRoute: UploadRoute,
