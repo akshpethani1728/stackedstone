@@ -227,4 +227,69 @@
     transition: transform 1400ms cubic-bezier(.2,.7,.2,1);
   }
   .img-zoom:hover img { transform: scale(1.04); }
-}
+
+  /* Underline that draws on hover */
+  .story-underline {
+    position: relative;
+  }
+  .story-underline::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+  }
+  .story-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* Subtle breathing for hero CTAs / book covers */
+  .breathe {
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* Editorial long-form prose used by legal & journal pages */
+  .prose-stacked p,
+  .prose-stacked li {
+    color: var(--muted-foreground);
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    margin-top: 1.25rem;
+  }
+  .prose-stacked .lead {
+    color: var(--foreground);
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    line-height: 1.45;
+    letter-spacing: -0.015em;
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+  }
+  .prose-stacked h2 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    letter-spacing: -0.015em;
+    margin-top: 3.5rem;
+    color: var(--foreground);
+  }
+  .prose-stacked a {
+    color: var(--foreground);
+    border-bottom: 1px solid var(--border);
+    transition: border-color 300ms;
+  }
+  .prose-stacked a:hover { border-color: var(--foreground); }
+
+  /* Smooth page transition */
+  main { animation: page-in 700ms cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
