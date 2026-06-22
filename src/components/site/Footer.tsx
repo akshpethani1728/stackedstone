@@ -1,9 +1,41 @@
+import { Link } from "@tanstack/react-router";
+
+type Col = {
+  title: string;
+  items: { label: string; to?: string; href?: string }[];
+};
+
+const cols: Col[] = [
+  {
+    title: "Shop",
+    items: [
+      { label: "Editions", to: "/create" },
+      { label: "Explore", to: "/explore" },
+      { label: "Gift", to: "/create" },
+      { label: "Account", to: "/account" },
+    ],
+  },
+  {
+    title: "Studio",
+    items: [
+      { label: "About", to: "/about" },
+      { label: "The Bindery", to: "/about" },
+      { label: "Journal", to: "/explore" },
+      { label: "Contact", to: "/contact" },
+    ],
+  },
+  {
+    title: "Care",
+    items: [
+      { label: "Shipping", to: "/legal/shipping" },
+      { label: "Refunds", to: "/legal/refund" },
+      { label: "FAQ", to: "/faq" },
+      { label: "Press", href: "mailto:press@stackedstone.co" },
+    ],
+  },
+];
+
 export function Footer() {
-  const cols = [
-    { title: "Shop", items: ["Editions", "Custom Volumes", "Gift Cards", "Slipcases"] },
-    { title: "Studio", items: ["About", "The Bindery", "Journal", "Contact"] },
-    { title: "Care", items: ["Shipping", "Returns", "FAQ", "Press"] },
-  ];
   return (
     <footer className="bg-background border-t border-border">
       <div className="container-edit py-20">
@@ -15,7 +47,10 @@ export function Footer() {
             <p className="mt-6 max-w-sm text-muted-foreground leading-relaxed">
               A small studio publishing travel books for the people who lived them.
             </p>
-            <form className="mt-10 flex items-center gap-4 max-w-sm border-b border-border pb-3">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="mt-10 flex items-center gap-4 max-w-sm border-b border-border pb-3"
+            >
               <input
                 type="email"
                 placeholder="Your email"
@@ -29,11 +64,21 @@ export function Footer() {
             <div key={c.title} className="md:col-span-2">
               <p className="eyebrow">{c.title}</p>
               <ul className="mt-6 space-y-3">
-                {c.items.map((i) => (
-                  <li key={i}>
-                    <a href="#" className="text-sm text-foreground/80 hover:text-foreground">{i}</a>
-                  </li>
-                ))}
+                {c.items.map((i) =>
+                  i.to ? (
+                    <li key={i.label}>
+                      <Link to={i.to} className="text-sm text-foreground/80 hover:text-foreground hover:italic transition-all">
+                        {i.label}
+                      </Link>
+                    </li>
+                  ) : (
+                    <li key={i.label}>
+                      <a href={i.href} className="text-sm text-foreground/80 hover:text-foreground hover:italic transition-all">
+                        {i.label}
+                      </a>
+                    </li>
+                  ),
+                )}
               </ul>
             </div>
           ))}
@@ -41,15 +86,20 @@ export function Footer() {
           <div className="md:col-span-1">
             <p className="eyebrow">Social</p>
             <ul className="mt-6 space-y-3 text-sm">
-              <li><a href="#" className="hover:text-foreground text-foreground/80">IG</a></li>
-              <li><a href="#" className="hover:text-foreground text-foreground/80">PIN</a></li>
+              <li><a href="https://instagram.com" className="hover:text-foreground text-foreground/80">IG</a></li>
+              <li><a href="https://pinterest.com" className="hover:text-foreground text-foreground/80">PIN</a></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-20 pt-8 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-[0.7rem] uppercase tracking-[0.28em] text-muted-foreground">
-          <span>© 2026 Stacked Stone Studio · Mumbai</span>
-          <span>Printed slowly, on uncoated paper.</span>
+          <span>© 2026 Stacked Stone Studio · Mumbai & Florence</span>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <Link to="/legal/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/legal/terms" className="hover:text-foreground">Terms</Link>
+            <Link to="/legal/refund" className="hover:text-foreground">Refund</Link>
+            <Link to="/legal/shipping" className="hover:text-foreground">Shipping</Link>
+          </div>
         </div>
       </div>
     </footer>
