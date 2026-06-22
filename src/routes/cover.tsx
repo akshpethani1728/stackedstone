@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { BookMockup } from "@/components/studio/BookMockup";
-import { coversFor, useStudio } from "@/lib/studio-store";
+import { coversFor } from "@/data";
+import { useStudio } from "@/stores/studio";
 
 export const Route = createFileRoute("/cover")({
   head: () => ({

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
-import { materials, useStudio } from "@/lib/studio-store";
+import { materials } from "@/data";
+import { useStudio } from "@/stores/studio";
 
 export const Route = createFileRoute("/material")({
   head: () => ({
@@ -56,7 +57,7 @@ function MaterialPage() {
                   />
                   <div className="absolute top-6 left-6 right-6 flex items-start justify-between">
                     <span className="eyebrow !text-background/90">N° 0{i + 1}</span>
-                    <span className="eyebrow !text-background/90">{m.priceDelta === 0 ? "Included" : `+ $${m.priceDelta}`}</span>
+                    <span className="eyebrow !text-background/90">{m.priceDelta === 0 ? "Included" : `+ ₹${m.priceDelta}`}</span>
                   </div>
                   {active && (
                     <span className="absolute bottom-5 right-5 eyebrow !text-background/95 bg-ink/40 px-3 py-1 backdrop-blur-sm">Selected</span>

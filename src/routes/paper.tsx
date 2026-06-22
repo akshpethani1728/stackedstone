@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
-import { papers, useStudio } from "@/lib/studio-store";
+import { papers } from "@/data";
+import { useStudio } from "@/stores/studio";
 
 export const Route = createFileRoute("/paper")({
   head: () => ({
@@ -54,7 +55,7 @@ function PaperPage() {
                       <p className="eyebrow !text-background/75">{p.weight}</p>
                       <p className="font-serif italic text-2xl mt-1">{p.finish}</p>
                     </div>
-                    <span className="eyebrow !text-background/85">{p.priceDelta === 0 ? "Included" : `+ $${p.priceDelta}`}</span>
+                    <span className="eyebrow !text-background/85">{p.priceDelta === 0 ? "Included" : `+ ₹${p.priceDelta}`}</span>
                   </div>
                   {active && (
                     <span className="absolute top-5 right-5 eyebrow !text-background/95 bg-ink/40 px-3 py-1 backdrop-blur-sm">Selected</span>

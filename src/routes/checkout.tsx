@@ -2,7 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { BookMockup } from "@/components/studio/BookMockup";
-import { coversFor, extraOptions, useStudio, type Extras } from "@/lib/studio-store";
+import { useStudio, type Extras } from "@/stores/studio";
+import { coversFor, extraOptions } from "@/data";
+import { subtotal, total, SHIPPING_COST } from "@/lib/pricing";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -32,18 +34,8 @@ function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const cover = state.cover ?? coversFor(state.destination?.slug)[0];
-  const ship = 18;
-  const extrasTotal = extraOptions.reduce(
-    (acc, e) => acc + (state.extras[e.slug as keyof Extras] ? e.price : 0),
-    0,
-  );
-  const subtotal =
-    (state.edition?.price ?? 149) +
-    (state.material?.priceDelta ?? 0) +
-    (state.paper?.priceDelta ?? 0) +
-    (state.pageCount?.priceDelta ?? 0) +
-    extrasTotal;
-  const total = subtotal + ship;
+  const subtotalAmount = subtotal(state);
+  const totalAmount = total(state);
 
   return (
     <StudioShell current="/checkout">
@@ -72,7 +64,7 @@ function CheckoutPage() {
               <Field label="Address" required placeholder="14 Carter Road, Bandra West" />
               <div className="grid md:grid-cols-3 gap-8">
                 <Field label="City" required placeholder="Mumbai" />
-                <Field label="Postal code" required placeholder="400050" />
+                <Field label="PIN Code" required placeholder="400050" />
                 <Field label="Country" required placeholder="India" defaultValue="India" />
               </div>
             </fieldset>
@@ -82,16 +74,16 @@ function CheckoutPage() {
               <Field label="Card number" required placeholder="4242  4242  4242  4242" />
               <div className="grid grid-cols-2 gap-8">
                 <Field label="Expiry" required placeholder="08 / 28" />
-                <Field label="CVC" required placeholder="123" />
+                <Field label="CVV" required placeholder="123" />
               </div>
             </fieldset>
 
             <div className="pt-6 flex flex-wrap items-center gap-8">
               <button type="submit" disabled={submitting} className="btn-primary">
-                {submitting ? "Sealing your order…" : `Place the order · $${total}`}
+                {submitting ? "Sealing your order…" : `Place the order · ₹${totalAmount}`}
               </button>
               <p className="text-muted-foreground text-sm max-w-xs">
-                Your book begins printing within 48 hours. You'll receive it in 14–18 days.
+                Your book begins printing within 48 hours. You'll receive it in 10–14 days.
               </p>
             </div>
           </form>
@@ -126,14 +118,14 @@ function CheckoutPage() {
                 {extraOptions.filter((e) => state.extras[e.slug as keyof Extras]).map((e) => (
                   <Line key={e.slug} k="Extra" v={e.name} />
                 ))}
-                <Line k="Estimated" v="14–18 days · Printed in India" />
+                <Line k="Estimated" v="10–14 days · Made in India" />
               </div>
 
               <div className="mt-8 border-t border-border pt-6 space-y-3 text-sm">
-                <Money k="Subtotal" v={subtotal} />
-                <Money k="Worldwide shipping" v={ship} />
+                <Money k="Subtotal" v={subtotalAmount} />
+                <Money k="Shipping across India" v={SHIPPING_COST} />
                 <div className="flex justify-between font-serif text-2xl pt-4 border-t border-border">
-                  <span>Total</span><span>${total}</span>
+                  <span>Total</span><span>₹{totalAmount}</span>
                 </div>
               </div>
 
@@ -157,10 +149,10 @@ function Line({ k, v }: { k: string; v?: string }) {
     </div>
   );
 }
-function Money({ k, v }: { k: string; v: number }) {
-  return (
-    <div className="flex justify-between">
-      <span>{k}</span><span>${v}</span>
-    </div>
-  );
-}
+  function Money({ k, v }: { k: string; v: number }) {
+    return (
+      <div className="flex justify-between">
+        <span>{k}</span><span>₹{v}</span>
+      </div>
+    );
+  }

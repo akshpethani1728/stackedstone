@@ -93,7 +93,7 @@ export function Footer() {
         </div>
 
         <div className="mt-20 pt-8 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-[0.7rem] uppercase tracking-[0.28em] text-muted-foreground">
-          <span>© 2026 Stacked Stone Studio · Mumbai & Florence</span>
+          <span>© 2026 Stacked Stone Studio · Mumbai & Jaipur</span>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link to="/legal/privacy" className="hover:text-foreground">Privacy</Link>
             <Link to="/legal/terms" className="hover:text-foreground">Terms</Link>

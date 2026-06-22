@@ -1,7 +1,7 @@
 import craft from "@/assets/craft-paper.jpg";
 
 const pillars = [
-  { k: "Paper", v: "150gsm uncoated Munken, archival cotton endpapers." },
+  { k: "Paper", v: "170 gsm archival cotton paper, uncoated, with deckled edge." },
   { k: "Binding", v: "Smyth-sewn signatures, debossed linen-wrapped board." },
   { k: "Print", v: "Stochastic six-colour offset, calibrated by hand." },
   { k: "Finish", v: "Wrapped in muslin, sealed with letterpressed seal." },
@@ -31,7 +31,7 @@ export function Craft() {
           </h2>
           <p className="mt-8 text-muted-foreground leading-relaxed max-w-lg">
             Every Stacked Stone book is produced in small batches by a single bindery
-            in Florence. The paper is chosen for its hand. The cloth is dyed in the
+            in Jaipur. The paper is chosen for its hand. The cloth is dyed in the
             shade. The press runs at half speed.
           </p>
 

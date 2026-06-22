@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
-import { useStudio } from "@/lib/studio-store";
+import { useStudio } from "@/stores/studio";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({

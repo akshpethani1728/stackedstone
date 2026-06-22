@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
-import { editions, useStudio } from "@/lib/studio-store";
+import { editions } from "@/data";
+import { useStudio } from "@/stores/studio";
 import bookIceland from "@/assets/book-iceland.jpg";
 import bookKyoto from "@/assets/book-kyoto.jpg";
 import bookMorocco from "@/assets/book-morocco.jpg";
@@ -30,7 +31,7 @@ function CreatePage() {
           Choose the<br /><span className="italic">volume</span> that holds your story.
         </h1>
         <p className="reveal delay-2 mt-8 max-w-md text-muted-foreground leading-relaxed">
-          Every edition is made in our Florence bindery — same paper, same craft. Only the proportions
+          Every edition is made in our Jaipur bindery — same paper, same craft. Only the proportions
           and the weight of the shelf change.
           {state.destination && (
             <span className="block mt-3 eyebrow !text-foreground">For {state.destination.name}</span>
@@ -61,7 +62,7 @@ function CreatePage() {
               </div>
               <div className="mt-10 flex items-baseline justify-between border-b border-border pb-4">
                 <span className="eyebrow">{e.pages}</span>
-                <span className="eyebrow">from ${e.price}</span>
+                <span className="eyebrow">from ₹{e.price}</span>
               </div>
               <h3 className="mt-6 font-serif text-4xl tracking-tight">{e.name}</h3>
               <p className="mt-3 italic text-foreground/70">{e.ideal}</p>

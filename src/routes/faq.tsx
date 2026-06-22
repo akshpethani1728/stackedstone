@@ -35,7 +35,7 @@ const groups = [
   {
     title: "Shipping & Care",
     items: [
-      { q: "Do you ship internationally?", a: "We ship worldwide via insured carbon-neutral courier, with duties pre-paid in most regions." },
+      { q: "Where do you ship?", a: "We ship to every city and town across India via insured, carbon-neutral courier. All taxes and duties are included — no surprises at your door." },
       { q: "How should I care for the book?", a: "Keep it out of direct sun. The linen will soften with handling. Spills wipe off the cover; the paper is uncoated and breathes." },
       { q: "Can I gift a book?", a: "Yes. Gift orders ship in a linen slipcase with a hand-written letterpressed card." },
     ],

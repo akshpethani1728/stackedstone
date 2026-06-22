@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useStudio } from "@/lib/studio-store";
+import { useStudio } from "@/stores/studio";
 import bookStack from "@/assets/book-stack.jpg";
 
 export const Route = createFileRoute("/success")({
@@ -35,7 +35,7 @@ function SuccessPage() {
             Your book<br />is being<br /><span className="italic">made.</span>
           </h1>
           <p className="reveal delay-2 mt-10 max-w-md text-muted-foreground leading-relaxed">
-            {state.title || state.destination?.name || "Your volume"} has entered our Florence
+            {state.title || state.destination?.name || "Your volume"} has entered our Jaipur
             bindery. The press will run in the morning. You'll receive a quiet update at every stage —
             no spam, only the truth.
           </p>
@@ -43,7 +43,7 @@ function SuccessPage() {
           <div className="reveal delay-3 mt-14 grid grid-cols-2 gap-8 max-w-md">
             <div>
               <p className="eyebrow">Expected with you</p>
-              <p className="font-serif text-2xl mt-2 italic">in 14–18 days</p>
+              <p className="font-serif text-2xl mt-2 italic">in 10–14 days</p>
             </div>
             <div>
               <p className="eyebrow">Edition</p>

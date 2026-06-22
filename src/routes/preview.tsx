@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { BookMockup } from "@/components/studio/BookMockup";
-import { coversFor, extraOptions, useStudio, type Extras } from "@/lib/studio-store";
+import { useStudio, type Extras } from "@/stores/studio";
+import { coversFor, extraOptions } from "@/data";
+import { subtotal } from "@/lib/pricing";
 import bookOpen from "@/assets/book-open.jpg";
 import shelf1 from "@/assets/shelf-1.jpg";
 import shelf2 from "@/assets/shelf-2.jpg";
@@ -33,16 +35,7 @@ function PreviewPage() {
     return userSpreads.length >= 2 ? userSpreads.slice(0, 8) : fallbackSpreads;
   }, [state.photos]);
 
-  const totalExtras = extraOptions.reduce(
-    (acc, e) => acc + (state.extras[e.slug as keyof Extras] ? e.price : 0),
-    0,
-  );
-  const total =
-    (state.edition?.price ?? 149) +
-    (state.material?.priceDelta ?? 0) +
-    (state.paper?.priceDelta ?? 0) +
-    (state.pageCount?.priceDelta ?? 0) +
-    totalExtras;
+  const total = subtotal(state);
 
   if (!cover) {
     return (
@@ -128,7 +121,7 @@ function PreviewPage() {
                 <li>· {state.paper?.weight ?? "170 gsm"} {state.paper?.name ?? "Premium Matte"}</li>
                 <li>· Smyth-sewn signatures · lay-flat binding</li>
                 <li>· {state.material?.name ?? "Linen Hardcover"}, debossed spine</li>
-                <li>· Printed in India · arrives in 14–18 days</li>
+                <li>· Printed in India · arrives in 10–14 days</li>
               </ul>
             </div>
             <Link to="/upload" className="btn-ghost !text-background/70 inline-flex">← Revise photographs</Link>
@@ -159,7 +152,7 @@ function PreviewPage() {
                       <p className="text-muted-foreground mt-1 italic">{e.note}</p>
                     </div>
                     <div className="flex items-center gap-6">
-                      <span className="font-serif text-xl">+ ${e.price}</span>
+                      <span className="font-serif text-xl">+ ₹{e.price}</span>
                       <span
                         className={`h-5 w-5 border transition-colors ${active ? "bg-foreground border-foreground" : "border-foreground/40 group-hover:border-foreground"}`}
                         aria-hidden
@@ -190,28 +183,28 @@ function PreviewPage() {
             <p className="text-muted-foreground mt-1">{state.destination?.region ?? "—"}</p>
 
             <div className="mt-10 border-t border-border pt-8 space-y-3 text-sm">
-              <Row k="Edition"     v={state.edition?.name}     a={`$${state.edition?.price ?? 0}`} />
+              <Row k="Edition"     v={state.edition?.name}     a={`₹${state.edition?.price ?? 0}`} />
               <Row k="Cover"       v={cover.name} />
-              <Row k="Material"    v={state.material?.name}    a={state.material?.priceDelta ? `+ $${state.material.priceDelta}` : "Included"} />
-              <Row k="Paper"       v={state.paper?.name}       a={state.paper?.priceDelta ? `+ $${state.paper.priceDelta}` : "Included"} />
-              <Row k="Pages"       v={state.pageCount ? `${state.pageCount.pages} pages` : "—"} a={state.pageCount?.priceDelta ? `+ $${state.pageCount.priceDelta}` : "Included"} />
+              <Row k="Material"    v={state.material?.name}    a={state.material?.priceDelta ? `+ ₹${state.material.priceDelta}` : "Included"} />
+              <Row k="Paper"       v={state.paper?.name}       a={state.paper?.priceDelta ? `+ ₹${state.paper.priceDelta}` : "Included"} />
+              <Row k="Pages"       v={state.pageCount ? `${state.pageCount.pages} pages` : "—"} a={state.pageCount?.priceDelta ? `+ ₹${state.pageCount.priceDelta}` : "Included"} />
               <Row k="Photographs" v={`${state.photoCount || 0}`} />
               {extraOptions.filter((e) => state.extras[e.slug as keyof Extras]).map((e) => (
-                <Row key={e.slug} k="Extra" v={e.name} a={`+ $${e.price}`} />
+                <Row key={e.slug} k="Extra" v={e.name} a={`+ ₹${e.price}`} />
               ))}
             </div>
 
             <div className="mt-8 border-t border-border pt-6 flex items-baseline justify-between">
               <span className="eyebrow">Subtotal</span>
-              <span className="font-serif text-3xl">${total}</span>
+              <span className="font-serif text-3xl">₹{total}</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Worldwide shipping calculated at checkout.</p>
+            <p className="text-xs text-muted-foreground mt-2">Inclusive of all taxes. Shipping across India — ₹499.</p>
 
             <button onClick={() => navigate({ to: "/checkout" })} className="btn-primary mt-8 w-full">
               Proceed to checkout
             </button>
             <p className="mt-6 text-xs text-muted-foreground italic leading-relaxed">
-              Estimated delivery: 14–18 days. Printed in India, finished by hand.
+              Estimated delivery: 10–14 days. Printed in India, finished by hand.
             </p>
           </div>
         </aside>

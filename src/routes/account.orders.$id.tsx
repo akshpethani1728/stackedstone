@@ -14,10 +14,10 @@ export const Route = createFileRoute("/account/orders/$id")({
 
 const stages = [
   { k: "Book Created", note: "Files received. Sequencing approved.", date: "Mar 02" },
-  { k: "Printing", note: "Six-colour offset, Florence.", date: "Mar 04" },
+  { k: "Printing", note: "Six-colour offset, Jaipur.", date: "Mar 04" },
   { k: "Quality Check", note: "Spine, signatures, colour pass.", date: "Mar 06" },
   { k: "Packaging", note: "Wrapped in muslin, sealed.", date: "Mar 07" },
-  { k: "Shipped", note: "DHL Express · tracking active.", date: "Mar 08" },
+  { k: "Shipped", note: "Courier · tracking active.", date: "Mar 08" },
   { k: "Delivered", note: "Into your hands.", date: "—" },
 ];
 
@@ -79,7 +79,7 @@ function OrderDetail() {
           </div>
           <div>
             <p className="eyebrow">Courier</p>
-            <p className="font-serif text-2xl mt-3 italic">DHL Express</p>
+            <p className="font-serif text-2xl mt-3 italic">Premium courier</p>
             <p className="text-muted-foreground mt-1">Tracking · 1Z 9X4 88K 421</p>
           </div>
           <div>

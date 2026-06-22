@@ -5,21 +5,21 @@ export const Route = createFileRoute("/legal/shipping")({
   head: () => ({
     meta: [
       { title: "Shipping — Stacked Stone" },
-      { name: "description", content: "Worldwide shipping, timelines and packaging for Stacked Stone editions." },
+      { name: "description", content: "Shipping across India, timelines and packaging for Stacked Stone editions." },
     ],
   }),
   component: () => (
-    <LegalLayout eyebrow="Shipping" title="From Florence," italic="to your door." updated="June 2026">
+    <LegalLayout eyebrow="Shipping" title="From Jaipur," italic="to your door." updated="June 2026">
       <p className="lead">
-        Each volume is printed in Tuscany, bound by hand, then sent out wrapped in cotton
-        cloth and a recycled board sleeve. We ship worldwide.
+        Each volume is printed in Jaipur, bound by hand, then sent out wrapped in cotton
+        cloth and a recycled board sleeve. We ship across India.
       </p>
 
       <h2>Timelines</h2>
-      <p>Books are produced in 4–6 weeks. Shipping then takes 5–10 working days, depending on country.</p>
+      <p>Books are produced in 2–3 weeks. Shipping then takes 3–7 working days, depending on your city.</p>
 
       <h2>Where we ship</h2>
-      <p>We ship to 80+ countries via insured, carbon-neutral courier. Duties are pre-paid for most regions; checkout confirms the final figure for your address.</p>
+      <p>We ship to every city and town across India via insured, carbon-neutral courier. All duties included; no surprises at your door.</p>
 
       <h2>Packaging</h2>
       <p>Every book travels inside its linen slipcase, inside a recycled corrugate sleeve, inside a rigid outer box. Three quiet layers.</p>

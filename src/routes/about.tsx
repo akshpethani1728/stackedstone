@@ -58,8 +58,8 @@ function AboutPage() {
               Paper that<br /><span className="italic">remembers.</span>
             </h2>
             <p className="mt-8 text-lg leading-relaxed text-muted-foreground">
-              Munken Pure, uncoated, 150gsm. Smyth-sewn signatures, linen-wrapped boards,
-              foil-stamped spines. Each volume is printed in Florence and bound by hand.
+              Archival cotton paper, uncoated, 170 gsm. Smyth-sewn signatures, linen-wrapped boards,
+              foil-stamped spines. Each volume is printed in Jaipur and bound by hand.
             </p>
           </div>
         </div>
@@ -87,10 +87,10 @@ function AboutPage() {
         <div className="container-edit text-center">
           <p className="eyebrow !text-background/70">Studio</p>
           <h2 className="display mt-6 text-5xl md:text-7xl max-w-3xl mx-auto">
-            A small team, in<br /><span className="italic">Mumbai & Florence.</span>
+            A small team, in<br /><span className="italic">Mumbai & Jaipur.</span>
           </h2>
           <p className="mt-10 max-w-xl mx-auto text-background/75 leading-relaxed">
-            Six people. Two cities. One bindery we have used for nine years.
+            Six people. Two cities. One bindery we have trusted for a decade.
             We publish slowly because that's the only way we know how.
           </p>
         </div>

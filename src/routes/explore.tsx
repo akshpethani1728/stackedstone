@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Navigation } from "@/components/site/Navigation";
 import { Footer } from "@/components/site/Footer";
-import { destinations } from "@/lib/destinations";
+import { destinations } from "@/data";
 import shelf1 from "@/assets/shelf-1.jpg";
 import shelf2 from "@/assets/shelf-2.jpg";
 import bookOpen from "@/assets/book-open.jpg";

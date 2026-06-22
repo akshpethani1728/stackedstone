@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
-import { pageCounts, useStudio } from "@/lib/studio-store";
+import { pageCounts } from "@/data";
+import { useStudio } from "@/stores/studio";
 
 export const Route = createFileRoute("/pages")({
   head: () => ({
@@ -61,7 +62,7 @@ function PagesPage() {
                   </div>
                 </div>
                 <p className="italic text-foreground/70 mt-6 text-center">{pc.ideal}</p>
-                <p className="eyebrow text-center mt-3">{pc.priceDelta === 0 ? "Included" : `+ $${pc.priceDelta}`}</p>
+                <p className="eyebrow text-center mt-3">{pc.priceDelta === 0 ? "Included" : `+ ₹${pc.priceDelta}`}</p>
               </button>
             );
           })}

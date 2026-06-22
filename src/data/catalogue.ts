@@ -1,5 +1,4 @@
-// Session-scoped store for the book commissioning flow.
-import { useEffect, useState } from "react";
+import type { Cover, Edition, Extras, Material, PageCount, Paper } from "@/types";
 import bali from "@/assets/dest-bali.jpg";
 import kashmir from "@/assets/dest-kashmir.jpg";
 import goa from "@/assets/dest-goa.jpg";
@@ -13,180 +12,11 @@ import craftPaper from "@/assets/craft-paper.jpg";
 import shelf1 from "@/assets/shelf-1.jpg";
 import shelf2 from "@/assets/shelf-2.jpg";
 
-export type Edition = {
-  slug: "weekend" | "journey" | "explorer" | "collector";
-  name: string;
-  pages: string;
-  size: string;
-  price: number;
-  ideal: string;
-  photoEstimate: string;
-  description: string;
-};
-
-export type Destination = {
-  slug: string;
-  name: string;
-  region: string;
-  tagline: string;
-};
-
-export type Cover = {
-  slug: string;
-  name: string;
-  mood: string;
-  ink: string;        // typographic ink color
-  panel: string;      // optional band/panel tint (rgba ok)
-  image: string;
-};
-
-export type Material = {
-  slug: string;
-  name: string;
-  feel: string;
-  description: string;
-  priceDelta: number;
-  swatch: string; // css color
-  texture: string; // image
-};
-
-export type Paper = {
-  slug: string;
-  name: string;
-  weight: string;
-  finish: string;
-  bestFor: string;
-  priceDelta: number;
-  texture: string;
-};
-
-export type PageCount = {
-  pages: number;
-  label: string;
-  recommended: [number, number];
-  ideal: string;
-  priceDelta: number;
-};
-
-export type Extras = {
-  giftWrap: boolean;
-  giftMessage: string;
-  storageBox: boolean;
-  extraCopy: boolean;
-};
-
-export type StudioState = {
-  destination?: Destination;
-  edition?: Edition;
-  cover?: Cover;
-  material?: Material;
-  paper?: Paper;
-  pageCount?: PageCount;
-  photos: string[];     // object URLs only (lost on reload — that's fine)
-  photoCount: number;
-  title?: string;
-  extras: Extras;
-};
-
-const KEY = "stacked.studio.v2";
-
-const emptyExtras: Extras = { giftWrap: false, giftMessage: "", storageBox: false, extraCopy: false };
-const empty: StudioState = { photoCount: 0, photos: [], extras: emptyExtras };
-
-function read(): StudioState {
-  if (typeof window === "undefined") return empty;
-  try {
-    const raw = window.sessionStorage.getItem(KEY);
-    if (!raw) return empty;
-    const parsed = JSON.parse(raw);
-    return { ...empty, ...parsed, extras: { ...emptyExtras, ...(parsed.extras ?? {}) } };
-  } catch {
-    return empty;
-  }
-}
-
-function write(state: StudioState) {
-  if (typeof window === "undefined") return;
-  // Don't persist photo blob URLs — they're not valid across reloads.
-  const { photos: _p, ...rest } = state;
-  window.sessionStorage.setItem(KEY, JSON.stringify(rest));
-  window.dispatchEvent(new CustomEvent("studio:change"));
-}
-
-let memory: StudioState | null = null;
-
-export function useStudio() {
-  const [state, setState] = useState<StudioState>(empty);
-
-  useEffect(() => {
-    const initial = memory ?? read();
-    memory = initial;
-    setState(initial);
-    const handler = () => setState({ ...(memory ?? read()) });
-    window.addEventListener("studio:change", handler);
-    return () => window.removeEventListener("studio:change", handler);
-  }, []);
-
-  const patch = (next: Partial<StudioState>) => {
-    const base = memory ?? read();
-    const merged: StudioState = { ...base, ...next };
-    memory = merged;
-    write(merged);
-    setState(merged);
-  };
-
-  const reset = () => {
-    memory = empty;
-    write(empty);
-    setState(empty);
-  };
-
-  return { state, patch, reset };
-}
-
-/* ---------- catalogues ---------- */
-
 export const editions: Edition[] = [
-  {
-    slug: "weekend",
-    name: "Weekend Edition",
-    pages: "24–36 pages",
-    size: "8 × 10 in",
-    price: 89,
-    ideal: "A single chapter — a weekend, a wedding, a quiet retreat.",
-    photoEstimate: "20–45 photographs",
-    description: "Slim, deliberate. A volume that reads like a long postcard.",
-  },
-  {
-    slug: "journey",
-    name: "Journey Edition",
-    pages: "48–72 pages",
-    size: "10 × 12 in",
-    price: 149,
-    ideal: "A single trip across a country or coastline.",
-    photoEstimate: "45–80 photographs",
-    description: "Our most loved edition — room to breathe, weight to hold.",
-  },
-  {
-    slug: "explorer",
-    name: "Explorer Edition",
-    pages: "72–120 pages",
-    size: "11 × 13 in",
-    price: 199,
-    ideal: "A season abroad. Two or three destinations woven together.",
-    photoEstimate: "70–110 photographs",
-    description: "Generous. The kind of book a guest opens uninvited.",
-  },
-  {
-    slug: "collector",
-    name: "Collector's Edition",
-    pages: "120–200 pages",
-    size: "12 × 14 in",
-    price: 289,
-    ideal: "A year, a body of work, a quiet monument.",
-    photoEstimate: "100–160 photographs",
-    description: "Numbered, slip-cased, made to outlive the shelf.",
-  },
+  { slug: "weekend", name: "Weekend Edition", pages: "24–36 pages", size: "8 × 10 in", price: 4990, ideal: "A single chapter — a weekend, a wedding, a quiet retreat.", photoEstimate: "20–45 photographs", description: "Slim, deliberate. A volume that reads like a long postcard." },
+  { slug: "journey", name: "Journey Edition", pages: "48–72 pages", size: "10 × 12 in", price: 7990, ideal: "A single trip across a country or coastline.", photoEstimate: "45–80 photographs", description: "Our most loved edition — room to breathe, weight to hold." },
+  { slug: "explorer", name: "Explorer Edition", pages: "72–120 pages", size: "11 × 13 in", price: 10990, ideal: "A season abroad. Two or three destinations woven together.", photoEstimate: "70–110 photographs", description: "Generous. The kind of book a guest opens uninvited." },
+  { slug: "collector", name: "Collector's Edition", pages: "120–200 pages", size: "12 × 14 in", price: 14990, ideal: "A year, a body of work, a quiet monument.", photoEstimate: "100–160 photographs", description: "Numbered, slip-cased, made to outlive the shelf." },
 ];
 
 const coverArt: Record<string, string> = {
@@ -194,8 +24,6 @@ const coverArt: Record<string, string> = {
   europe: iceland, japan: kyoto, shelf1, shelf2,
 };
 
-// Curated cover collections per destination. Reuses existing imagery
-// with typographic ink + panel treatments so each cover feels designed.
 export const coverCollections: Record<string, Cover[]> = {
   goa: [
     { slug: "minimal-sand",  name: "Minimal Sand",  mood: "Faded yellow, late verandah",  ink: "#3a2418", panel: "rgba(246,236,220,0.78)", image: goa },
@@ -235,7 +63,7 @@ export const coverCollections: Record<string, Cover[]> = {
   ],
   ladakh: [
     { slug: "high-road",     name: "High Road",      mood: "Where the road simply stops",     ink: "#f0eee5", panel: "rgba(34,36,29,0.6)",       image: ladakh },
-    { slug: "monastery",     name: "Monastery",      mood: "Saffron walls, butter lamps",     ink: "#22241d", panel: "rgba(236,235,228,0.75)",   image: ladakh },
+    { slug: "monastery",     name: "Monastery",      mood: "Saffron walls, butter lamps",     ink: "#22241d", panel: "rgba(236,235,228,0.75)",  image: ladakh },
     { slug: "pangong",       name: "Pangong",        mood: "Blue beyond believing",           ink: "#f0eee5", panel: "rgba(40,70,90,0.55)",      image: iceland },
     { slug: "stone-altar",   name: "Stone Altar",    mood: "Painted prayer on a cliff",       ink: "#22241d", panel: "rgba(236,235,228,0.6)",    image: kashmir },
   ],
@@ -263,92 +91,30 @@ export function coversFor(slug?: string): Cover[] {
 }
 
 export const materials: Material[] = [
-  {
-    slug: "classic",
-    name: "Classic Hardcover",
-    feel: "Smooth, slightly cool to the touch.",
-    description: "Cloth-wrapped board with a matte print finish. Quiet, archival, dependable.",
-    priceDelta: 0,
-    swatch: "#e7e2d6",
-    texture: shelf1,
-  },
-  {
-    slug: "linen",
-    name: "Linen Hardcover",
-    feel: "Open weave, gentle texture under the thumb.",
-    description: "European linen wrapped over rigid board, debossed by hand for the title and spine.",
-    priceDelta: 24,
-    swatch: "#c7bca6",
-    texture: craftPaper,
-  },
-  {
-    slug: "matte",
-    name: "Premium Matte",
-    feel: "Velvety, almost chalky.",
-    description: "A fine matte lamination across photographic board. Resists glare, holds shadow.",
-    priceDelta: 18,
-    swatch: "#3a3530",
-    texture: shelf2,
-  },
-  {
-    slug: "soft-touch",
-    name: "Soft-touch Lamination",
-    feel: "Suede-like. A surprise the first time.",
-    description: "An extraordinary tactile coating that softens light and invites a second look.",
-    priceDelta: 28,
-    swatch: "#1f1d1b",
-    texture: shelf1,
-  },
+  { slug: "classic", name: "Classic Hardcover", feel: "Smooth, slightly cool to the touch.", description: "Cloth-wrapped board with a matte print finish. Quiet, archival, dependable.", priceDelta: 0, swatch: "#e7e2d6", texture: shelf1 },
+  { slug: "linen", name: "Linen Bound", feel: "Open weave, gentle texture under the thumb.", description: "European linen wrapped over rigid board, debossed by hand for the title and spine.", priceDelta: 1490, swatch: "#c7bca6", texture: craftPaper },
+  { slug: "matte", name: "Premium Matte", feel: "Velvety, almost chalky.", description: "A fine matte lamination across photographic board. Resists glare, holds shadow.", priceDelta: 990, swatch: "#3a3530", texture: shelf2 },
+  { slug: "soft-touch", name: "Soft Touch", feel: "Suede-like. A surprise the first time.", description: "An extraordinary tactile coating that softens light and invites a second look.", priceDelta: 1690, swatch: "#1f1d1b", texture: shelf1 },
 ];
 
 export const papers: Paper[] = [
-  {
-    slug: "premium-matte",
-    name: "Premium Matte",
-    weight: "170 gsm",
-    finish: "Smooth, low-glare",
-    bestFor: "Honest light, candid portraits.",
-    priceDelta: 0,
-    texture: craftPaper,
-  },
-  {
-    slug: "silk",
-    name: "Silk",
-    weight: "200 gsm",
-    finish: "Subtle satin sheen",
-    bestFor: "Architecture, interiors, the long horizon.",
-    priceDelta: 14,
-    texture: shelf2,
-  },
-  {
-    slug: "lustre",
-    name: "Lustre",
-    weight: "230 gsm",
-    finish: "Deep blacks, gentle gloss",
-    bestFor: "Nightscapes, food, anything you want to hold.",
-    priceDelta: 22,
-    texture: shelf1,
-  },
-  {
-    slug: "fine-art",
-    name: "Fine Art",
-    weight: "270 gsm cotton",
-    finish: "Uncoated, museum-grade",
-    bestFor: "Black & white, fine grain, archival commissions.",
-    priceDelta: 38,
-    texture: craftPaper,
-  },
+  { slug: "premium-matte", name: "Premium Matte", weight: "170 gsm", finish: "Smooth, low-glare", bestFor: "Honest light, candid portraits.", priceDelta: 0, texture: craftPaper },
+  { slug: "silk", name: "Silk", weight: "200 gsm", finish: "Subtle satin sheen", bestFor: "Architecture, interiors, the long horizon.", priceDelta: 790, texture: shelf2 },
+  { slug: "lustre", name: "Lustre", weight: "230 gsm", finish: "Deep blacks, gentle gloss", bestFor: "Nightscapes, food, anything you want to hold.", priceDelta: 1290, texture: shelf1 },
+  { slug: "fine-art", name: "Fine Art Cotton", weight: "270 gsm cotton", finish: "Uncoated, museum-grade", bestFor: "Black & white, fine grain, archival commissions.", priceDelta: 1990, texture: craftPaper },
 ];
 
 export const pageCounts: PageCount[] = [
   { pages: 24, label: "24 pages", recommended: [20, 35], ideal: "A weekend, a short story.",            priceDelta: 0 },
-  { pages: 36, label: "36 pages", recommended: [30, 55], ideal: "A long trip, a single place.",         priceDelta: 14 },
-  { pages: 48, label: "48 pages", recommended: [45, 75], ideal: "A country, a season, a slow read.",    priceDelta: 26 },
-  { pages: 72, label: "72 pages", recommended: [70, 120], ideal: "A body of work — your most loved.",   priceDelta: 48 },
+  { pages: 36, label: "36 pages", recommended: [30, 55], ideal: "A long trip, a single place.",         priceDelta: 790 },
+  { pages: 48, label: "48 pages", recommended: [45, 75], ideal: "A country, a season, a slow read.",    priceDelta: 1490 },
+  { pages: 72, label: "72 pages", recommended: [70, 120], ideal: "A body of work — your most loved.",   priceDelta: 2490 },
 ];
 
 export const extraOptions = [
-  { slug: "giftWrap",    name: "Gift wrapping",        note: "Hand-tied muslin & wax seal.",          price: 12 },
-  { slug: "storageBox",  name: "Premium storage box",  note: "Linen-clad slipcase, foam-lined.",      price: 38 },
-  { slug: "extraCopy",   name: "Extra copy",           note: "A second volume, same craft.",          price: 110 },
+  { slug: "giftWrap",    name: "Gift wrapping",        note: "Hand-tied muslin & wax seal.",          price: 690 },
+  { slug: "storageBox",  name: "Premium storage box",  note: "Linen-clad slipcase, foam-lined.",      price: 1990 },
+  { slug: "extraCopy",   name: "Extra copy",           note: "A second volume, same craft.",          price: 5990 },
 ] as const;
+
+export type ExtraOption = (typeof extraOptions)[number];

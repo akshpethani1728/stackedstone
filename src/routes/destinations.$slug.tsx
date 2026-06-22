@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Navigation } from "@/components/site/Navigation";
 import { Footer } from "@/components/site/Footer";
-import { destinations, getDestination } from "@/lib/destinations";
+import { destinations, getDestination } from "@/data";
 
 export const Route = createFileRoute("/destinations/$slug")({
   head: ({ params }) => {

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
-import { useStudio, type Destination } from "@/lib/studio-store";
+import { useStudio } from "@/stores/studio";
+import type { Destination } from "@/types";
 import bali from "@/assets/dest-bali.jpg";
 import kashmir from "@/assets/dest-kashmir.jpg";
 import goa from "@/assets/dest-goa.jpg";

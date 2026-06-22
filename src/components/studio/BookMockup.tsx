@@ -1,4 +1,4 @@
-import type { Cover, Destination, Edition } from "@/lib/studio-store";
+import type { Cover, Destination, Edition } from "@/types";
 
 type Props = {
   cover: Cover;

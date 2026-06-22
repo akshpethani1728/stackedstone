@@ -69,7 +69,7 @@ function LibraryPage() {
           <Link to="/account/orders" className="group">
             <p className="eyebrow">Recent orders</p>
             <h3 className="font-serif text-3xl mt-3">1 in transit</h3>
-            <p className="text-muted-foreground mt-2">Kyoto, leaving Florence Friday.</p>
+            <p className="text-muted-foreground mt-2">Kyoto, leaving Jaipur Friday.</p>
             <span className="btn-ghost mt-6 inline-flex">Track orders →</span>
           </Link>
           <Link to="/account/profile" className="group">
