@@ -30,7 +30,7 @@ export function AccountShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Link to="/create" className="btn-primary !py-3 !px-5">Begin a volume</Link>
+          <Link to="/destination" className="btn-primary !py-3 !px-5">Begin a volume</Link>
         </div>
       </header>
       {children}

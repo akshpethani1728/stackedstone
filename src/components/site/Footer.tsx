@@ -9,9 +9,9 @@ const cols: Col[] = [
   {
     title: "Shop",
     items: [
-      { label: "Editions", to: "/create" },
+      { label: "Editions", to: "/destination" },
       { label: "Explore", to: "/explore" },
-      { label: "Gift", to: "/create" },
+      { label: "Gift", to: "/destination" },
       { label: "Account", to: "/account" },
     ],
   },

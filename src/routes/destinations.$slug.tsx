@@ -101,7 +101,7 @@ function DestinationDetail() {
               <div><dt className="eyebrow" style={{ color: d.palette.accent }}>Pages</dt><dd className="mt-2">120 – 220</dd></div>
               <div><dt className="eyebrow" style={{ color: d.palette.accent }}>Format</dt><dd className="mt-2">Petit · Standard · Grand</dd></div>
             </dl>
-            <Link to="/create" className="btn-primary mt-12">Commission yours</Link>
+            <Link to="/destination" className="btn-primary mt-12">Commission yours</Link>
           </div>
         </div>
       </section>
@@ -177,7 +177,7 @@ function DestinationDetail() {
           Bind your own<br /><span className="italic">{d.name}.</span>
         </h2>
         <Link
-          to="/create"
+          to="/destination"
           className="inline-flex items-center justify-center gap-3 mt-12 px-8 py-4 text-[0.72rem] uppercase tracking-[0.28em] border transition-colors"
           style={{ background: d.palette.bg, color: d.palette.ink, borderColor: d.palette.bg }}
         >
