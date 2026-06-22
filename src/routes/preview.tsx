@@ -159,7 +159,7 @@ function PreviewPage() {
                       <p className="text-muted-foreground mt-1 italic">{e.note}</p>
                     </div>
                     <div className="flex items-center gap-6">
-                      <span className="font-serif text-xl">{e.price === 0 ? "Included" : `+ $${e.price}`}</span>
+                      <span className="font-serif text-xl">+ ${e.price}</span>
                       <span
                         className={`h-5 w-5 border transition-colors ${active ? "bg-foreground border-foreground" : "border-foreground/40 group-hover:border-foreground"}`}
                         aria-hidden
