@@ -12,13 +12,22 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as PreviewRouteImport } from './routes/preview'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DestinationRouteImport } from './routes/destination'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as CraftingRouteImport } from './routes/crafting'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
+import { Route as LegalShippingRouteImport } from './routes/legal.shipping'
+import { Route as LegalRefundRouteImport } from './routes/legal.refund'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as DestinationsSlugRouteImport } from './routes/destinations.$slug'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountDraftsRouteImport } from './routes/account.drafts'
@@ -40,6 +49,16 @@ const PreviewRoute = PreviewRouteImport.update({
   path: '/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DestinationRoute = DestinationRouteImport.update({
   id: '/destination',
   path: '/destination',
@@ -55,6 +74,11 @@ const CraftingRoute = CraftingRouteImport.update({
   path: '/crafting',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
@@ -63,6 +87,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -74,6 +103,31 @@ const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AccountRoute,
+} as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalShippingRoute = LegalShippingRouteImport.update({
+  id: '/legal/shipping',
+  path: '/legal/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRefundRoute = LegalRefundRouteImport.update({
+  id: '/legal/refund',
+  path: '/legal/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestinationsSlugRoute = DestinationsSlugRouteImport.update({
+  id: '/destinations/$slug',
+  path: '/destinations/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AccountProfileRoute = AccountProfileRouteImport.update({
   id: '/profile',
@@ -103,32 +157,50 @@ const AccountOrdersIdRoute = AccountOrdersIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/crafting': typeof CraftingRoute
   '/create': typeof CreateRoute
   '/destination': typeof DestinationRoute
+  '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/preview': typeof PreviewRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
   '/account/drafts': typeof AccountDraftsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/profile': typeof AccountProfileRoute
+  '/destinations/$slug': typeof DestinationsSlugRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/refund': typeof LegalRefundRoute
+  '/legal/shipping': typeof LegalShippingRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/account/': typeof AccountIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/crafting': typeof CraftingRoute
   '/create': typeof CreateRoute
   '/destination': typeof DestinationRoute
+  '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/preview': typeof PreviewRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
   '/account/drafts': typeof AccountDraftsRoute
   '/account/profile': typeof AccountProfileRoute
+  '/destinations/$slug': typeof DestinationsSlugRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/refund': typeof LegalRefundRoute
+  '/legal/shipping': typeof LegalShippingRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/account': typeof AccountIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders': typeof AccountOrdersIndexRoute
@@ -136,17 +208,26 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/crafting': typeof CraftingRoute
   '/create': typeof CreateRoute
   '/destination': typeof DestinationRoute
+  '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/preview': typeof PreviewRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
   '/account/drafts': typeof AccountDraftsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/profile': typeof AccountProfileRoute
+  '/destinations/$slug': typeof DestinationsSlugRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/refund': typeof LegalRefundRoute
+  '/legal/shipping': typeof LegalShippingRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/account/': typeof AccountIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
@@ -155,49 +236,76 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/account'
     | '/checkout'
+    | '/contact'
     | '/crafting'
     | '/create'
     | '/destination'
+    | '/explore'
+    | '/faq'
     | '/preview'
     | '/success'
     | '/upload'
     | '/account/drafts'
     | '/account/orders'
     | '/account/profile'
+    | '/destinations/$slug'
+    | '/legal/privacy'
+    | '/legal/refund'
+    | '/legal/shipping'
+    | '/legal/terms'
     | '/account/'
     | '/account/orders/$id'
     | '/account/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/checkout'
+    | '/contact'
     | '/crafting'
     | '/create'
     | '/destination'
+    | '/explore'
+    | '/faq'
     | '/preview'
     | '/success'
     | '/upload'
     | '/account/drafts'
     | '/account/profile'
+    | '/destinations/$slug'
+    | '/legal/privacy'
+    | '/legal/refund'
+    | '/legal/shipping'
+    | '/legal/terms'
     | '/account'
     | '/account/orders/$id'
     | '/account/orders'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/account'
     | '/checkout'
+    | '/contact'
     | '/crafting'
     | '/create'
     | '/destination'
+    | '/explore'
+    | '/faq'
     | '/preview'
     | '/success'
     | '/upload'
     | '/account/drafts'
     | '/account/orders'
     | '/account/profile'
+    | '/destinations/$slug'
+    | '/legal/privacy'
+    | '/legal/refund'
+    | '/legal/shipping'
+    | '/legal/terms'
     | '/account/'
     | '/account/orders/$id'
     | '/account/orders/'
@@ -205,14 +313,23 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
+  ContactRoute: typeof ContactRoute
   CraftingRoute: typeof CraftingRoute
   CreateRoute: typeof CreateRoute
   DestinationRoute: typeof DestinationRoute
+  ExploreRoute: typeof ExploreRoute
+  FaqRoute: typeof FaqRoute
   PreviewRoute: typeof PreviewRoute
   SuccessRoute: typeof SuccessRoute
   UploadRoute: typeof UploadRoute
+  DestinationsSlugRoute: typeof DestinationsSlugRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalRefundRoute: typeof LegalRefundRoute
+  LegalShippingRoute: typeof LegalShippingRoute
+  LegalTermsRoute: typeof LegalTermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -238,6 +355,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destination': {
       id: '/destination'
       path: '/destination'
@@ -259,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CraftingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
@@ -271,6 +409,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -286,6 +431,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/'
       preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof AccountRoute
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/shipping': {
+      id: '/legal/shipping'
+      path: '/legal/shipping'
+      fullPath: '/legal/shipping'
+      preLoaderRoute: typeof LegalShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/refund': {
+      id: '/legal/refund'
+      path: '/legal/refund'
+      fullPath: '/legal/refund'
+      preLoaderRoute: typeof LegalRefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destinations/$slug': {
+      id: '/destinations/$slug'
+      path: '/destinations/$slug'
+      fullPath: '/destinations/$slug'
+      preLoaderRoute: typeof DestinationsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/account/profile': {
       id: '/account/profile'
@@ -358,14 +538,23 @@ const AccountRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AccountRoute: AccountRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
+  ContactRoute: ContactRoute,
   CraftingRoute: CraftingRoute,
   CreateRoute: CreateRoute,
   DestinationRoute: DestinationRoute,
+  ExploreRoute: ExploreRoute,
+  FaqRoute: FaqRoute,
   PreviewRoute: PreviewRoute,
   SuccessRoute: SuccessRoute,
   UploadRoute: UploadRoute,
+  DestinationsSlugRoute: DestinationsSlugRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalRefundRoute: LegalRefundRoute,
+  LegalShippingRoute: LegalShippingRoute,
+  LegalTermsRoute: LegalTermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 
 const links = [
-  { label: "Collections", href: "#collections" },
-  { label: "Process", href: "#process" },
-  { label: "Craft", href: "#craft" },
-  { label: "Journal", href: "#journal" },
+  { label: "Explore", to: "/explore" as const },
+  { label: "About", to: "/about" as const },
+  { label: "FAQ", to: "/faq" as const },
+  { label: "Contact", to: "/contact" as const },
 ];
 
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -18,44 +21,49 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => { setOpen(false); }, [pathname]);
+
+  const transparent = isHome && !scrolled;
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-background/85 backdrop-blur-xl border-b border-border/60"
-          : "bg-transparent"
+        transparent
+          ? "bg-transparent"
+          : "bg-background/85 backdrop-blur-xl border-b border-border/60"
       }`}
     >
       <div className="container-edit flex items-center justify-between py-5">
-        <a href="#" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group">
           <span className="font-serif text-[1.35rem] tracking-tight leading-none">
             Stacked<span className="italic"> Stone</span>
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-12">
           {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/80 hover:text-foreground transition-colors"
+            <Link
+              key={l.to}
+              to={l.to}
+              className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/80 hover:text-foreground transition-colors story-underline"
+              activeProps={{ className: "text-[0.72rem] uppercase tracking-[0.28em] text-foreground" }}
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
-            Sign in
-          </a>
-          <a href="/create" className="btn-primary !py-3 !px-5">
+          <Link to="/account" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
+            Account
+          </Link>
+          <Link to="/create" className="btn-primary !py-3 !px-5">
             Create yours
-          </a>
+          </Link>
         </div>
 
         <button
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
           className="md:hidden h-9 w-9 flex flex-col items-center justify-center gap-[5px]"
           onClick={() => setOpen((v) => !v)}
         >
@@ -66,18 +74,18 @@ export function Navigation() {
 
       {open && (
         <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
-          <div className="container-edit py-8 flex flex-col gap-6">
+          <div className="container-edit py-10 flex flex-col gap-6">
             {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="font-serif text-3xl"
+              <Link
+                key={l.to}
+                to={l.to}
+                className="font-serif text-4xl tracking-tight"
               >
                 {l.label}
-              </a>
+              </Link>
             ))}
-            <a href="/create" className="btn-primary mt-4 w-fit">Create yours</a>
+            <Link to="/account" className="font-serif text-2xl text-muted-foreground mt-2">Account</Link>
+            <Link to="/create" className="btn-primary mt-6 w-fit">Create yours</Link>
           </div>
         </div>
       )}
