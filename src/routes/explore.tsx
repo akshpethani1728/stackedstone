@@ -160,7 +160,7 @@ function ExplorePage() {
         <h2 className="display mt-6 text-5xl md:text-7xl">
           Your own chapter,<br /><span className="italic">awaits.</span>
         </h2>
-        <Link to="/create" className="btn-primary mt-12">Start a book</Link>
+        <Link to="/destination" className="btn-primary mt-12">Start a book</Link>
       </section>
 
       <Footer />

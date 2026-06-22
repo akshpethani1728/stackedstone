@@ -104,7 +104,7 @@ function AboutPage() {
           <h2 className="display text-5xl md:text-6xl">
             Begin a book<br /><span className="italic">of your own.</span>
           </h2>
-          <Link to="/create" className="btn-primary mt-10">Start commissioning</Link>
+          <Link to="/destination" className="btn-primary mt-10">Start commissioning</Link>
         </div>
       </section>
 

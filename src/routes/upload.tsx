@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { useStudio } from "@/lib/studio-store";
@@ -22,6 +22,11 @@ function UploadPage() {
   const [drag, setDrag] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const pc = state.pageCount;
+  const min = pc?.recommended[0] ?? 20;
+  const max = pc?.recommended[1] ?? 120;
+  const rec = pc ? Math.round((pc.recommended[0] + pc.recommended[1]) / 2) : 35;
+
   useEffect(() => {
     return () => photos.forEach((p) => URL.revokeObjectURL(p.url));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -31,7 +36,7 @@ function UploadPage() {
     if (!files) return;
     const next: Photo[] = Array.from(files)
       .filter((f) => f.type.startsWith("image/"))
-      .slice(0, 24)
+      .slice(0, max + 6)
       .map((f, i) => ({
         id: `${Date.now()}-${i}`,
         url: URL.createObjectURL(f),
@@ -39,37 +44,54 @@ function UploadPage() {
         x: Math.random() * 60 - 30,
         y: Math.random() * 30 - 15,
       }));
-    setPhotos((p) => [...p, ...next].slice(0, 36));
+    setPhotos((p) => [...p, ...next].slice(0, max + 12));
   };
 
   const proceed = () => {
-    patch({ photoCount: photos.length || 24, title: state.title ?? state.destination?.name });
-    navigate({ to: "/crafting" });
+    patch({
+      photoCount: photos.length || rec,
+      photos: photos.map((p) => p.url),
+      title: state.title ?? state.destination?.name,
+    });
+    navigate({ to: "/preview" });
   };
+
+  const count = photos.length;
+  const enough = count >= min;
 
   return (
     <StudioShell current="/upload">
       <section className="container-edit pt-24 md:pt-28 pb-10">
         <div className="grid md:grid-cols-12 gap-10 items-end">
           <div className="md:col-span-7">
-            <p className="eyebrow">Step Three · The Photographs</p>
+            <p className="eyebrow">Step Seven · The Photographs</p>
             <h1 className="display mt-6 text-5xl md:text-7xl">
               Lay them on<br /><span className="italic">the table.</span>
             </h1>
           </div>
-          <p className="md:col-span-4 text-muted-foreground leading-relaxed">
-            Drop in 30–120 photographs. We'll sequence them like a magazine — by light, by colour, by
-            rhythm. You'll review every spread before anything is printed.
-          </p>
+          <div className="md:col-span-4 text-muted-foreground leading-relaxed">
+            <p className="italic text-foreground/80">For your {pc?.pages ?? 48}-page volume</p>
+            <div className="mt-4 grid grid-cols-3 gap-4 max-w-xs">
+              <div>
+                <p className="eyebrow">Recommended</p>
+                <p className="font-serif text-3xl text-foreground mt-1">{rec}</p>
+              </div>
+              <div>
+                <p className="eyebrow">Minimum</p>
+                <p className="font-serif text-3xl text-foreground/80 mt-1">{min}</p>
+              </div>
+              <div>
+                <p className="eyebrow">Maximum</p>
+                <p className="font-serif text-3xl text-foreground/80 mt-1">{max}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="container-edit pb-16">
         <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDrag(true);
-          }}
+          onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
           onDrop={(e) => {
             e.preventDefault();
@@ -82,16 +104,8 @@ function UploadPage() {
           }`}
           style={{ minHeight: "62vh" }}
         >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => onFiles(e.target.files)}
-          />
+          <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
 
-          {/* Paper grain */}
           <div className="absolute inset-0 opacity-[0.05] mix-blend-multiply" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, #000 1px, transparent 1px), radial-gradient(circle at 70% 60%, #000 1px, transparent 1px)", backgroundSize: "40px 40px, 60px 60px" }} />
 
           {photos.length === 0 ? (
@@ -100,7 +114,7 @@ function UploadPage() {
               <p className="font-serif italic text-3xl md:text-4xl mt-8 max-w-md leading-snug">
                 Drag your photographs here, or <span className="underline underline-offset-4">choose them from your library</span>.
               </p>
-              <p className="eyebrow mt-8">JPEG · PNG · HEIC · up to 120 frames</p>
+              <p className="eyebrow mt-8">JPEG · PNG · HEIC · up to {max} frames</p>
             </div>
           ) : (
             <div className="relative" style={{ height: "62vh" }}>
@@ -121,8 +135,10 @@ function UploadPage() {
                 </div>
               ))}
               <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                <span className="eyebrow bg-background/80 backdrop-blur px-4 py-2">{photos.length} photographs on the table</span>
-                <span className="eyebrow bg-background/80 backdrop-blur px-4 py-2">+ add more</span>
+                <span className="eyebrow bg-background/85 backdrop-blur px-4 py-2">
+                  {count} of {rec} recommended · {enough ? "ready to bind" : `add ${min - count} more`}
+                </span>
+                <span className="eyebrow bg-background/85 backdrop-blur px-4 py-2">+ add more</span>
               </div>
             </div>
           )}
@@ -139,13 +155,12 @@ function UploadPage() {
             />
           </div>
           <div className="flex items-center gap-8">
-            <button onClick={() => setPhotos([])} className="btn-ghost text-muted-foreground">
-              Clear table
-            </button>
+            <Link to="/pages" className="btn-ghost text-muted-foreground">← Pages</Link>
+            <button onClick={() => setPhotos([])} className="btn-ghost text-muted-foreground">Clear table</button>
             <button
               onClick={proceed}
-              disabled={photos.length === 0}
-              className={`btn-primary ${photos.length === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
+              disabled={!enough}
+              className={`btn-primary ${!enough ? "opacity-40 cursor-not-allowed" : ""}`}
             >
               Bind the book
             </button>

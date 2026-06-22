@@ -57,7 +57,7 @@ export function Navigation() {
           <Link to="/account" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
             Account
           </Link>
-          <Link to="/create" className="btn-primary !py-3 !px-5">
+          <Link to="/destination" className="btn-primary !py-3 !px-5">
             Create yours
           </Link>
         </div>
@@ -85,7 +85,7 @@ export function Navigation() {
               </Link>
             ))}
             <Link to="/account" className="font-serif text-2xl text-muted-foreground mt-2">Account</Link>
-            <Link to="/create" className="btn-primary mt-6 w-fit">Create yours</Link>
+            <Link to="/destination" className="btn-primary mt-6 w-fit">Create yours</Link>
           </div>
         </div>
       )}
