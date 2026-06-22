@@ -30,7 +30,7 @@ export function Hero() {
             books — bound by hand, designed for the shelf, made to outlive the screen.
           </p>
           <div className="reveal delay-3 mt-10 flex flex-wrap items-center gap-8">
-            <a href="#create" className="btn-primary !bg-background !text-ink !border-background hover:!bg-transparent hover:!text-background">
+            <a href="/create" className="btn-primary !bg-background !text-ink !border-background hover:!bg-transparent hover:!text-background">
               Begin your book
             </a>
             <a href="#collections" className="btn-ghost text-background/90">

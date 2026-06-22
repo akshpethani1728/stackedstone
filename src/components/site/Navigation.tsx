@@ -49,7 +49,7 @@ export function Navigation() {
           <a href="#" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
             Sign in
           </a>
-          <a href="#create" className="btn-primary !py-3 !px-5">
+          <a href="/create" className="btn-primary !py-3 !px-5">
             Create yours
           </a>
         </div>
@@ -77,7 +77,7 @@ export function Navigation() {
                 {l.label}
               </a>
             ))}
-            <a href="#create" className="btn-primary mt-4 w-fit">Create yours</a>
+            <a href="/create" className="btn-primary mt-4 w-fit">Create yours</a>
           </div>
         </div>
       )}
