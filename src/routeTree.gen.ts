@@ -9,38 +9,270 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadRouteImport } from './routes/upload'
+import { Route as SuccessRouteImport } from './routes/success'
+import { Route as PreviewRouteImport } from './routes/preview'
+import { Route as DestinationRouteImport } from './routes/destination'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as CraftingRouteImport } from './routes/crafting'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as AccountProfileRouteImport } from './routes/account.profile'
+import { Route as AccountOrdersRouteImport } from './routes/account.orders'
+import { Route as AccountDraftsRouteImport } from './routes/account.drafts'
+import { Route as AccountOrdersIndexRouteImport } from './routes/account.orders.index'
+import { Route as AccountOrdersIdRouteImport } from './routes/account.orders.$id'
 
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuccessRoute = SuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewRoute = PreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestinationRoute = DestinationRouteImport.update({
+  id: '/destination',
+  path: '/destination',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CraftingRoute = CraftingRouteImport.update({
+  id: '/crafting',
+  path: '/crafting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountProfileRoute = AccountProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountOrdersRoute = AccountOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountDraftsRoute = AccountDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountOrdersIndexRoute = AccountOrdersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountOrdersRoute,
+} as any)
+const AccountOrdersIdRoute = AccountOrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AccountOrdersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteWithChildren
+  '/checkout': typeof CheckoutRoute
+  '/crafting': typeof CraftingRoute
+  '/create': typeof CreateRoute
+  '/destination': typeof DestinationRoute
+  '/preview': typeof PreviewRoute
+  '/success': typeof SuccessRoute
+  '/upload': typeof UploadRoute
+  '/account/drafts': typeof AccountDraftsRoute
+  '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/profile': typeof AccountProfileRoute
+  '/account/': typeof AccountIndexRoute
+  '/account/orders/$id': typeof AccountOrdersIdRoute
+  '/account/orders/': typeof AccountOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/crafting': typeof CraftingRoute
+  '/create': typeof CreateRoute
+  '/destination': typeof DestinationRoute
+  '/preview': typeof PreviewRoute
+  '/success': typeof SuccessRoute
+  '/upload': typeof UploadRoute
+  '/account/drafts': typeof AccountDraftsRoute
+  '/account/profile': typeof AccountProfileRoute
+  '/account': typeof AccountIndexRoute
+  '/account/orders/$id': typeof AccountOrdersIdRoute
+  '/account/orders': typeof AccountOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteWithChildren
+  '/checkout': typeof CheckoutRoute
+  '/crafting': typeof CraftingRoute
+  '/create': typeof CreateRoute
+  '/destination': typeof DestinationRoute
+  '/preview': typeof PreviewRoute
+  '/success': typeof SuccessRoute
+  '/upload': typeof UploadRoute
+  '/account/drafts': typeof AccountDraftsRoute
+  '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/profile': typeof AccountProfileRoute
+  '/account/': typeof AccountIndexRoute
+  '/account/orders/$id': typeof AccountOrdersIdRoute
+  '/account/orders/': typeof AccountOrdersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/checkout'
+    | '/crafting'
+    | '/create'
+    | '/destination'
+    | '/preview'
+    | '/success'
+    | '/upload'
+    | '/account/drafts'
+    | '/account/orders'
+    | '/account/profile'
+    | '/account/'
+    | '/account/orders/$id'
+    | '/account/orders/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/checkout'
+    | '/crafting'
+    | '/create'
+    | '/destination'
+    | '/preview'
+    | '/success'
+    | '/upload'
+    | '/account/drafts'
+    | '/account/profile'
+    | '/account'
+    | '/account/orders/$id'
+    | '/account/orders'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/checkout'
+    | '/crafting'
+    | '/create'
+    | '/destination'
+    | '/preview'
+    | '/success'
+    | '/upload'
+    | '/account/drafts'
+    | '/account/orders'
+    | '/account/profile'
+    | '/account/'
+    | '/account/orders/$id'
+    | '/account/orders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
+  CraftingRoute: typeof CraftingRoute
+  CreateRoute: typeof CreateRoute
+  DestinationRoute: typeof DestinationRoute
+  PreviewRoute: typeof PreviewRoute
+  SuccessRoute: typeof SuccessRoute
+  UploadRoute: typeof UploadRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/success': {
+      id: '/success'
+      path: '/success'
+      fullPath: '/success'
+      preLoaderRoute: typeof SuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview': {
+      id: '/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof PreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destination': {
+      id: '/destination'
+      path: '/destination'
+      fullPath: '/destination'
+      preLoaderRoute: typeof DestinationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crafting': {
+      id: '/crafting'
+      path: '/crafting'
+      fullPath: '/crafting'
+      preLoaderRoute: typeof CraftingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +280,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/': {
+      id: '/account/'
+      path: '/'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/profile': {
+      id: '/account/profile'
+      path: '/profile'
+      fullPath: '/account/profile'
+      preLoaderRoute: typeof AccountProfileRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/orders': {
+      id: '/account/orders'
+      path: '/orders'
+      fullPath: '/account/orders'
+      preLoaderRoute: typeof AccountOrdersRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/drafts': {
+      id: '/account/drafts'
+      path: '/drafts'
+      fullPath: '/account/drafts'
+      preLoaderRoute: typeof AccountDraftsRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/orders/': {
+      id: '/account/orders/'
+      path: '/'
+      fullPath: '/account/orders/'
+      preLoaderRoute: typeof AccountOrdersIndexRouteImport
+      parentRoute: typeof AccountOrdersRoute
+    }
+    '/account/orders/$id': {
+      id: '/account/orders/$id'
+      path: '/$id'
+      fullPath: '/account/orders/$id'
+      preLoaderRoute: typeof AccountOrdersIdRouteImport
+      parentRoute: typeof AccountOrdersRoute
+    }
   }
 }
 
+interface AccountOrdersRouteChildren {
+  AccountOrdersIdRoute: typeof AccountOrdersIdRoute
+  AccountOrdersIndexRoute: typeof AccountOrdersIndexRoute
+}
+
+const AccountOrdersRouteChildren: AccountOrdersRouteChildren = {
+  AccountOrdersIdRoute: AccountOrdersIdRoute,
+  AccountOrdersIndexRoute: AccountOrdersIndexRoute,
+}
+
+const AccountOrdersRouteWithChildren = AccountOrdersRoute._addFileChildren(
+  AccountOrdersRouteChildren,
+)
+
+interface AccountRouteChildren {
+  AccountDraftsRoute: typeof AccountDraftsRoute
+  AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
+  AccountProfileRoute: typeof AccountProfileRoute
+  AccountIndexRoute: typeof AccountIndexRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountDraftsRoute: AccountDraftsRoute,
+  AccountOrdersRoute: AccountOrdersRouteWithChildren,
+  AccountProfileRoute: AccountProfileRoute,
+  AccountIndexRoute: AccountIndexRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
+  CraftingRoute: CraftingRoute,
+  CreateRoute: CreateRoute,
+  DestinationRoute: DestinationRoute,
+  PreviewRoute: PreviewRoute,
+  SuccessRoute: SuccessRoute,
+  UploadRoute: UploadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
