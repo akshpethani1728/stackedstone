@@ -36,7 +36,7 @@ export const Route = createFileRoute("/destinations/$slug")({
 });
 
 function DestinationDetail() {
-  const d = Route.useLoaderData();
+  const d = Route.useLoaderData() as import("@/lib/destinations").DestinationEntry;
   const related = destinations.filter((x) => d.pairings.includes(x.slug));
 
   return (
