@@ -103,6 +103,7 @@ CREATE POLICY "Users can update own notification events" ON public.notification_
 -- Jobs should be manageable by the system (SECURITY DEFINER RPC) and readable by order owners
 DROP POLICY IF EXISTS "Jobs are system-managed" ON public.jobs;
 DROP POLICY IF EXISTS "Admins have full access to jobs" ON public.jobs;
+DROP POLICY IF EXISTS "Order owners can read jobs" ON public.jobs;
 
 CREATE POLICY "Order owners can read jobs" ON public.jobs
   FOR SELECT USING (
