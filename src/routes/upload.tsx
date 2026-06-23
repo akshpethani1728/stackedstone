@@ -1,7 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { useStudio } from "@/stores/studio";
+import { AuthService } from "@/services/auth.service";
+import { UploadService } from "@/services/upload.service";
+import { UploadDropzone } from "@/components/studio/UploadDropzone";
+import { PhotoGallery } from "@/components/studio/PhotoGallery";
+import { UploadProgress } from "@/components/studio/UploadProgress";
+import { useUploadQueue } from "@/hooks/use-upload-queue";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -13,51 +19,168 @@ export const Route = createFileRoute("/upload")({
   component: UploadPage,
 });
 
-type Photo = { id: string; url: string; rot: number; x: number; y: number };
+type Photo = {
+  id: string;
+  storage_url: string;
+  sort_order: number;
+  width?: number | null;
+  height?: number | null;
+  file_size_bytes?: number | null;
+  created_at: string;
+};
 
 function UploadPage() {
   const navigate = useNavigate();
   const { state, patch } = useStudio();
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [drag, setDrag] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [existingPhotos, setExistingPhotos] = useState<Photo[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(true);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [userId, setUserId] = useState<string>("");
+  const [replaceTarget, setReplaceTarget] = useState<Photo | null>(null);
+  const [replaceLoading, setReplaceLoading] = useState(false);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const loadedRef = useRef(false);
+  const bookId = state.bookId;
+
+  useEffect(() => {
+    AuthService.requireAuth().then((u) => setUserId(u.id)).catch(() => {});
+  }, []);
+
+  const queue = useUploadQueue(bookId ?? null);
+
+  useEffect(() => {
+    const completed = queue.files.filter((f) => f.status === "completed" && f.record);
+    if (completed.length === 0) return;
+    const newPhotos: Photo[] = completed.map((f) => ({
+      id: f.record!.id,
+      storage_url: f.storageUrl ?? f.record!.storage_url,
+      sort_order: f.record!.sort_order,
+      width: f.record!.width ?? f.width ?? null,
+      height: f.record!.height ?? f.height ?? null,
+        file_size_bytes: f.record!.file_size_bytes ?? null,
+      created_at: f.record!.created_at,
+    }));
+    setExistingPhotos((prev) => {
+      const existingIds = new Set(prev.map((p) => p.id));
+      const trulyNew = newPhotos.filter((p) => !existingIds.has(p.id));
+      if (trulyNew.length === 0) return prev;
+      return [...prev, ...trulyNew].sort((a, b) => a.sort_order - b.sort_order);
+    });
+  }, [queue.files]);
 
   const pc = state.pageCount;
   const min = pc?.recommended[0] ?? 20;
   const max = pc?.recommended[1] ?? 120;
   const rec = pc ? Math.round((pc.recommended[0] + pc.recommended[1]) / 2) : 35;
 
+  const loadPhotos = useCallback(async () => {
+    if (!bookId) { setGalleryLoading(false); return; }
+    try {
+      const photos = await UploadService.listPhotos(bookId);
+      setExistingPhotos(photos);
+    } catch {
+      setExistingPhotos([]);
+    } finally {
+      setGalleryLoading(false);
+    }
+  }, [bookId]);
+
   useEffect(() => {
-    return () => photos.forEach((p) => URL.revokeObjectURL(p.url));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    loadPhotos();
+  }, [loadPhotos]);
+
+  const handleAddFiles = useCallback(
+    (files: FileList | File[]) => {
+      if (!bookId) return;
+      queue.addFiles(files, existingPhotos.length);
+    },
+    [bookId, queue, existingPhotos.length],
+  );
+
+  const handleRemove = useCallback(
+    async (photo: Photo) => {
+      if (!window.confirm("Remove this photograph?")) return;
+      try {
+        await UploadService.removePhoto(photo.id, photo.storage_url);
+        setExistingPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+        setSelected((prev) => { const next = new Set(prev); next.delete(photo.id); return next; });
+      } catch (err: any) {
+        alert(err?.message ?? "Failed to remove photo");
+      }
+    },
+    [],
+  );
+
+  const handleReplaceClick = useCallback((photo: Photo) => {
+    setReplaceTarget(photo);
+    setTimeout(() => replaceInputRef.current?.click(), 50);
   }, []);
 
-  const onFiles = (files: FileList | null) => {
-    if (!files) return;
-    const next: Photo[] = Array.from(files)
-      .filter((f) => f.type.startsWith("image/"))
-      .slice(0, max + 6)
-      .map((f, i) => ({
-        id: `${Date.now()}-${i}`,
-        url: URL.createObjectURL(f),
-        rot: (Math.random() - 0.5) * 12,
-        x: Math.random() * 60 - 30,
-        y: Math.random() * 30 - 15,
-      }));
-    setPhotos((p) => [...p, ...next].slice(0, max + 12));
-  };
+  const handleReplaceFile = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !replaceTarget || !bookId) return;
+      setReplaceLoading(true);
+      try {
+        const result = await UploadService.replacePhoto(bookId, userId, replaceTarget.id, replaceTarget.storage_url, file);
+        setExistingPhotos((prev) =>
+          prev.map((p) =>
+            p.id === replaceTarget.id
+               ? { ...p, storage_url: result.storageUrl, width: result.width, height: result.height, file_size_bytes: result.record.file_size_bytes }
+              : p,
+          ),
+        );
+      } catch (err: any) {
+        alert(err?.message ?? "Failed to replace photo");
+      } finally {
+        setReplaceLoading(false);
+        setReplaceTarget(null);
+        if (e.target) e.target.value = "";
+      }
+    },
+    [replaceTarget, bookId, userId],
+  );
+
+  const handleReorder = useCallback(async (photoIds: string[]) => {
+    try {
+      await UploadService.reorderPhotos(photoIds);
+      setExistingPhotos((prev) =>
+        photoIds.map((id, i) => {
+          const found = prev.find((p) => p.id === id);
+          return found ? { ...found, sort_order: i } : undefined;
+        }).filter(Boolean) as Photo[],
+      );
+    } catch {}
+  }, []);
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelected((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
+  }, []);
 
   const proceed = () => {
     patch({
-      photoCount: photos.length || rec,
-      photos: photos.map((p) => p.url),
+      photoCount: existingPhotos.length || rec,
       title: state.title ?? state.destination?.name,
     });
     navigate({ to: "/preview" });
   };
 
-  const count = photos.length;
-  const enough = count >= min;
+  const totalPhotos = existingPhotos.length;
+  const enough = totalPhotos >= min;
+
+  if (!bookId) {
+    return (
+      <StudioShell current="/upload">
+        <section className="container-edit pt-24 md:pt-28 pb-10 text-center">
+          <h1 className="display text-3xl md:text-5xl mt-6">Start a draft first</h1>
+          <p className="text-muted-foreground mt-4">Choose your destination and preferences before adding photographs.</p>
+          <Link to="/destination" className="btn-primary mt-8 inline-block">Begin creating</Link>
+        </section>
+      </StudioShell>
+    );
+  }
 
   return (
     <StudioShell current="/upload">
@@ -81,70 +204,91 @@ function UploadPage() {
                 <p className="font-serif text-3xl text-foreground/80 mt-1">{min}</p>
               </div>
               <div>
-                <p className="eyebrow">Maximum</p>
-                <p className="font-serif text-3xl text-foreground/80 mt-1">{max}</p>
+                <p className="eyebrow">Uploaded</p>
+                <p className="font-serif text-3xl text-foreground/80 mt-1">{totalPhotos}</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      <section className="container-edit pb-6">
+        <UploadDropzone
+          onFiles={handleAddFiles}
+          disabled={totalPhotos >= max}
+          maxPhotos={max}
+          currentCount={totalPhotos}
+        />
+      </section>
+
+      {queue.stats.total > 0 && (
+        <section className="container-edit pb-6">
+          <UploadProgress
+            stats={queue.stats}
+            files={queue.files}
+            isPaused={queue.isPaused}
+            onPause={queue.pause}
+            onResume={queue.resume}
+            onRetryAll={queue.retryAll}
+            onClearCompleted={queue.clearCompleted}
+          />
+        </section>
+      )}
+
       <section className="container-edit pb-16">
-        <div
-          onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
-          onDragLeave={() => setDrag(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDrag(false);
-            onFiles(e.dataTransfer.files);
-          }}
-          onClick={() => inputRef.current?.click()}
-          className={`relative cursor-pointer rounded-sm transition-all duration-700 overflow-hidden ${
-            drag ? "bg-beige" : "bg-stone-warm/60"
-          }`}
-          style={{ minHeight: "62vh" }}
-        >
-          <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
-
-          <div className="absolute inset-0 opacity-[0.05] mix-blend-multiply" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, #000 1px, transparent 1px), radial-gradient(circle at 70% 60%, #000 1px, transparent 1px)", backgroundSize: "40px 40px, 60px 60px" }} />
-
-          {photos.length === 0 ? (
-            <div className="relative h-[62vh] flex flex-col items-center justify-center text-center px-6">
-              <div className="w-px h-20 bg-foreground/40" />
-              <p className="font-serif italic text-3xl md:text-4xl mt-8 max-w-md leading-snug">
-                Drag your photographs here, or <span className="underline underline-offset-4">choose them from your library</span>.
-              </p>
-              <p className="eyebrow mt-8">JPEG · PNG · HEIC · up to {max} frames</p>
-            </div>
-          ) : (
-            <div className="relative" style={{ height: "62vh" }}>
-              {photos.map((p, i) => (
-                <div
-                  key={p.id}
-                  className="absolute book-shadow bg-background p-2"
-                  style={{
-                    left: `${10 + ((i * 11) % 75)}%`,
-                    top: `${8 + ((i * 17) % 65)}%`,
-                    transform: `translate(${p.x}px, ${p.y}px) rotate(${p.rot}deg)`,
-                    width: "180px",
-                    transition: "transform 600ms cubic-bezier(.2,.7,.2,1)",
-                    zIndex: i,
-                  }}
-                >
-                  <img src={p.url} alt="" className="w-full h-44 object-cover" />
-                </div>
-              ))}
-              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                <span className="eyebrow bg-background/85 backdrop-blur px-4 py-2">
-                  {count} of {rec} recommended · {enough ? "ready to bind" : `add ${min - count} more`}
-                </span>
-                <span className="eyebrow bg-background/85 backdrop-blur px-4 py-2">+ add more</span>
-              </div>
-            </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-serif text-2xl">
+            Gallery <span className="text-muted-foreground">· {totalPhotos} photo{totalPhotos !== 1 ? "s" : ""}</span>
+          </h2>
+          {selected.size > 0 && (
+            <button
+              onClick={async () => {
+                if (!window.confirm(`Remove ${selected.size} selected photo${selected.size !== 1 ? "s" : ""}?`)) return;
+                for (const id of selected) {
+                  const photo = existingPhotos.find((p) => p.id === id);
+                  if (photo) {
+                    try {
+                      await UploadService.removePhoto(photo.id, photo.storage_url);
+                    } catch {}
+                  }
+                }
+                setExistingPhotos((prev) => prev.filter((p) => !selected.has(p.id)));
+                setSelected(new Set());
+              }}
+              className="text-[0.6rem] uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors"
+            >
+              Remove selected ({selected.size})
+            </button>
           )}
         </div>
 
-        <div className="mt-10 flex flex-wrap items-end justify-between gap-8 border-t border-border pt-10">
+        <input
+          ref={replaceInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif"
+          className="hidden"
+          onChange={handleReplaceFile}
+        />
+
+        <PhotoGallery
+          photos={existingPhotos}
+          selected={selected}
+          onToggleSelect={toggleSelect}
+          onRemove={handleRemove}
+          onReplace={handleReplaceClick}
+          onReorder={handleReorder}
+          loading={galleryLoading}
+        />
+
+        {replaceLoading && (
+          <div className="mt-4 text-sm text-muted-foreground italic">
+            Replacing photograph...
+          </div>
+        )}
+      </section>
+
+      <section className="container-edit pb-16">
+        <div className="flex flex-wrap items-end justify-between gap-8 border-t border-border pt-10">
           <div className="max-w-md">
             <label className="eyebrow block mb-3">Title of your volume</label>
             <input
@@ -156,13 +300,12 @@ function UploadPage() {
           </div>
           <div className="flex items-center gap-8">
             <Link to="/pages" className="btn-ghost text-muted-foreground">← Pages</Link>
-            <button onClick={() => setPhotos([])} className="btn-ghost text-muted-foreground">Clear table</button>
             <button
               onClick={proceed}
               disabled={!enough}
               className={`btn-primary ${!enough ? "opacity-40 cursor-not-allowed" : ""}`}
             >
-              Bind the book
+              {enough ? "Bind the book" : `Add ${min - totalPhotos} more`}
             </button>
           </div>
         </div>

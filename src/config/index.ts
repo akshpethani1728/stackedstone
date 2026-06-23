@@ -64,7 +64,7 @@ export const config = {
 
   featureFlags: {
     enableCheckout: false,
-    enableUpload: false,
+    enableUpload: true,
     enableAuth: true,
     enableAdminPanel: false,
   },
