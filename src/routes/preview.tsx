@@ -142,7 +142,6 @@ function PreviewRoute() {
             )}
           </div>
 
-          </div>
         </div>
       </section>
 
