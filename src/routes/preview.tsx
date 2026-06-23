@@ -4,9 +4,11 @@ import { StudioShell } from "@/components/studio/StudioShell";
 import { BookMockup } from "@/components/studio/BookMockup";
 import { BookPreview } from "@/components/studio/BookPreview";
 import { useStudio, type Extras } from "@/stores/studio";
-import { coversFor, extraOptions } from "@/data";
+import { coversFor, editions, materials, papers, pageCounts, extraOptions } from "@/data";
+import { destinations } from "@/data/destinations";
 import { subtotal } from "@/lib/pricing";
 import { BookGenerator } from "@/services/book-generator";
+import { LayoutEngine } from "@/services/layout-engine";
 import { config } from "@/config";
 import type { BookPreview as BookPreviewType, GenerationStatus } from "@/types/preview";
 
@@ -20,6 +22,15 @@ export const Route = createFileRoute("/preview")({
   component: PreviewRoute,
 });
 
+function buildSamplePreview(totalPages: number, gallery: string[]): BookPreviewType {
+  const photos = Array.from({ length: Math.max(totalPages + 4, 12) }, (_, i) => ({
+    id: `sample-${i}`,
+    storage_url: gallery[i % gallery.length],
+    sort_order: i,
+  }));
+  return LayoutEngine.generate({ photos, totalPages, bookId: "sample" });
+}
+
 function PreviewRoute() {
   const navigate = useNavigate();
   const { state, patch } = useStudio();
@@ -29,13 +40,28 @@ function PreviewRoute() {
   const genRef = useRef(false);
 
   const bookId = state.bookId;
-  const title = state.title || state.destination?.name || "Untitled Volume";
-  const cover = state.cover ?? coversFor(state.destination?.slug)[0];
-  const coverPhoto = state.photos?.[0];
-  const pageCount = state.pageCount?.pages ?? 48;
-  const totalPages = pageCount;
+  const isDemo = !bookId;
+
+  // Fallbacks so the page is always renderable on first visit.
+  const destination = state.destination ?? destinations[0];
+  const edition = state.edition ?? editions[1];
+  const cover = state.cover ?? coversFor(destination?.slug)[0];
+  const material = state.material ?? materials[0];
+  const paper = state.paper ?? papers[0];
+  const pageCountObj = state.pageCount ?? pageCounts[2];
+  const totalPages = pageCountObj.pages;
+
+  const title = state.title || destination?.name || "Untitled Volume";
+  const coverPhoto = state.photos?.[0] ?? cover?.image;
+  const sampleGallery: string[] = (destination?.gallery ?? [cover?.image]).filter(Boolean);
 
   const doGenerate = useCallback(async () => {
+    if (isDemo) {
+      setStatus("generating");
+      setPreview(buildSamplePreview(totalPages, sampleGallery));
+      setStatus("ready");
+      return;
+    }
     if (!bookId) return;
     setStatus("generating");
     setError(null);
@@ -47,51 +73,35 @@ function PreviewRoute() {
       setError(err?.message ?? "Failed to generate preview");
       setStatus("error");
     }
-  }, [bookId, totalPages]);
+  }, [bookId, totalPages, isDemo, sampleGallery]);
 
   useEffect(() => {
-    if (!bookId || genRef.current) return;
+    if (genRef.current) return;
     genRef.current = true;
 
-    BookGenerator.loadOrGenerate(bookId, totalPages)
+    if (isDemo) {
+      setPreview(buildSamplePreview(totalPages, sampleGallery));
+      setStatus("ready");
+      return;
+    }
+
+    BookGenerator.loadOrGenerate(bookId!, totalPages)
       .then((p) => { setPreview(p); setStatus("ready"); })
       .catch((err) => {
         if (err?.message?.includes("no photos")) {
-          setStatus("idle");
+          // Fall back to a sample so the page is never empty.
+          setPreview(buildSamplePreview(totalPages, sampleGallery));
+          setStatus("ready");
           return;
         }
-        BookGenerator.generate(bookId, totalPages)
+        BookGenerator.generate(bookId!, totalPages)
           .then((p) => { setPreview(p); setStatus("ready"); })
           .catch((e2) => { setError(e2?.message ?? "Failed"); setStatus("error"); });
       });
-  }, [bookId, totalPages]);
+  }, [bookId, totalPages, isDemo, sampleGallery]);
 
-  const total = subtotal(state);
+  const total = subtotal({ ...state, edition, material, paper, pageCount: pageCountObj });
   const hasCheckout = config.featureFlags.enableCheckout;
-
-  if (!cover) {
-    return (
-      <StudioShell current="/preview">
-        <section className="container-edit pt-32 pb-40 text-center">
-          <p className="eyebrow">Step Eight · Preview</p>
-          <h1 className="display mt-6 text-5xl">Choose your destination and cover first.</h1>
-          <Link to="/destination" className="btn-primary mt-10 inline-flex">Begin</Link>
-        </section>
-      </StudioShell>
-    );
-  }
-
-  if (!bookId) {
-    return (
-      <StudioShell current="/preview">
-        <section className="container-edit pt-32 pb-40 text-center">
-          <p className="eyebrow">Step Eight · Preview</p>
-          <h1 className="display mt-6 text-5xl">Start a draft first.</h1>
-          <Link to="/destination" className="btn-primary mt-10 inline-flex">Begin</Link>
-        </section>
-      </StudioShell>
-    );
-  }
 
   return (
     <StudioShell current="/preview">
@@ -101,32 +111,37 @@ function PreviewRoute() {
           <div className="md:col-span-7">
             <BookMockup
               cover={cover}
-              destination={state.destination}
-              edition={state.edition}
+              destination={destination}
+              edition={edition}
               title={title}
               photo={coverPhoto}
               size="lg"
             />
           </div>
           <div className="md:col-span-5">
-            <p className="eyebrow">Step Eight · The First Look</p>
+            <p className="eyebrow">Step Eight · The First Look{isDemo ? " · Sample" : ""}</p>
             <h1 className="display mt-6 text-5xl md:text-6xl tracking-tight">
               {title},<br /><span className="italic">in your hands.</span>
             </h1>
             <p className="mt-6 text-muted-foreground leading-relaxed max-w-md">
-              This is your book — your photograph on the cover, your name on the spine. Turn the spreads
-              below to see how it will read.
+              {isDemo
+                ? "A sample volume, arranged from our archive. Begin a draft to see your own photographs bound this way."
+                : "This is your book — your photograph on the cover, your name on the spine. Turn the spreads below to see how it will read."}
             </p>
             <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 max-w-md">
-              <Spec label="Edition" value={state.edition?.name ?? "—"} />
-              <Spec label="Destination" value={state.destination?.name ?? "—"} />
-              <Spec label="Cover" value={cover.name} />
-              <Spec label="Material" value={state.material?.name ?? "—"} />
-              <Spec label="Paper" value={state.paper?.name ?? "—"} />
-              <Spec label="Pages" value={state.pageCount ? `${state.pageCount.pages}` : "—"} />
-              <Spec label="Photos" value={`${state.photoCount || 0}`} />
+              <Spec label="Edition" value={edition?.name ?? "—"} />
+              <Spec label="Destination" value={destination?.name ?? "—"} />
+              <Spec label="Cover" value={cover?.name ?? "—"} />
+              <Spec label="Material" value={material?.name ?? "—"} />
+              <Spec label="Paper" value={paper?.name ?? "—"} />
+              <Spec label="Pages" value={pageCountObj ? `${pageCountObj.pages}` : "—"} />
+              <Spec label="Photos" value={`${isDemo ? "Sample" : state.photoCount || 0}`} />
             </div>
+            {isDemo && (
+              <Link to="/destination" className="btn-primary mt-10 inline-flex">Begin your own</Link>
+            )}
           </div>
+
         </div>
       </section>
 
@@ -243,15 +258,16 @@ function PreviewRoute() {
           <div className="border border-border p-10 bg-beige/30">
             <p className="eyebrow">Your volume</p>
             <h3 className="font-serif italic text-3xl mt-3">{title}</h3>
-            <p className="text-muted-foreground mt-1">{state.destination?.region ?? "—"}</p>
+            <p className="text-muted-foreground mt-1">{destination?.region ?? "—"}</p>
 
             <div className="mt-10 border-t border-border pt-8 space-y-3 text-sm">
-              <Row k="Edition"     v={state.edition?.name}     a={`₹${state.edition?.price ?? 0}`} />
-              <Row k="Cover"       v={cover.name} />
-              <Row k="Material"    v={state.material?.name}    a={state.material?.priceDelta ? `+ ₹${state.material.priceDelta}` : "Included"} />
-              <Row k="Paper"       v={state.paper?.name}       a={state.paper?.priceDelta ? `+ ₹${state.paper.priceDelta}` : "Included"} />
-              <Row k="Pages"       v={state.pageCount ? `${state.pageCount.pages} pages` : "—"} a={state.pageCount?.priceDelta ? `+ ₹${state.pageCount.priceDelta}` : "Included"} />
-              <Row k="Photographs" v={`${state.photoCount || 0}`} />
+              <Row k="Edition"     v={edition?.name}     a={`₹${edition?.price ?? 0}`} />
+              <Row k="Cover"       v={cover?.name} />
+              <Row k="Material"    v={material?.name}    a={material?.priceDelta ? `+ ₹${material.priceDelta}` : "Included"} />
+              <Row k="Paper"       v={paper?.name}       a={paper?.priceDelta ? `+ ₹${paper.priceDelta}` : "Included"} />
+              <Row k="Pages"       v={pageCountObj ? `${pageCountObj.pages} pages` : "—"} a={pageCountObj?.priceDelta ? `+ ₹${pageCountObj.priceDelta}` : "Included"} />
+              <Row k="Photographs" v={`${isDemo ? "Sample" : state.photoCount || 0}`} />
+
               {extraOptions.filter((e) => state.extras[e.slug as keyof Extras]).map((e) => (
                 <Row key={e.slug} k="Extra" v={e.name} a={`+ ₹${e.price}`} />
               ))}
