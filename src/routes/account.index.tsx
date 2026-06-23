@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AccountShell } from "@/components/studio/AccountShell";
 import { useDrafts, useBooks } from "@/hooks/use-drafts";
 import { useStudio } from "@/stores/studio";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { OrderService } from "@/services/order.service";
 
 export const Route = createFileRoute("/account/")({
   head: () => ({
@@ -18,8 +19,15 @@ function LibraryPage() {
   const navigate = useNavigate();
   const { createDraft } = useStudio();
   const { books, loading: booksLoading } = useBooks();
-  const { drafts, count: draftCount, loading: draftsLoading } = useDrafts();
+  const { count: draftCount, loading: draftsLoading } = useDrafts();
+  const [orderCount, setOrderCount] = useState(0);
   const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    OrderService.list().then((orders) => {
+      setOrderCount(orders.filter((o) => ["confirmed", "printing", "quality_check", "packaged", "shipped"].includes(o.status)).length);
+    }).catch(() => {});
+  }, []);
 
   const handleCreate = async () => {
     setCreating(true);
@@ -81,7 +89,7 @@ function LibraryPage() {
                   <Link
                     key={b.id}
                     to="/preview"
-                    className={`group block`}
+                    className="group block"
                   >
                     <div className="img-zoom aspect-[3/4] book-shadow bg-stone-warm flex items-center justify-center">
                       <span className="font-serif text-6xl italic text-muted-foreground/30">—</span>
@@ -107,7 +115,7 @@ function LibraryPage() {
               <Link to="/account/orders" className="group">
                 <p className="eyebrow">Recent orders</p>
                 <h3 className="font-serif text-3xl mt-3">
-                  {books.filter((b) => b.status === "ordered" || b.status === "shipped").length} in transit
+                  {orderCount > 0 ? `${orderCount} in transit` : "No active orders"}
                 </h3>
                 <p className="text-muted-foreground mt-2">Track your orders.</p>
                 <span className="btn-ghost mt-6 inline-flex">Track orders →</span>

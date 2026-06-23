@@ -10,9 +10,21 @@ export const config = {
     isProd: import.meta.env.PROD,
   },
 
+  razorpay: {
+    keyId: import.meta.env.VITE_RAZORPAY_KEY_ID as string | undefined,
+  },
+
   shipping: {
     acrossIndia: 499,
     estimatedDays: "10–14 days",
+    defaultWeight: 1200,
+    dimensions: { length: 30, width: 25, height: 5 },
+  },
+
+  extras: {
+    giftWrap: 690,
+    storageBox: 1990,
+    extraCopy: 5990,
   },
 
   studio: {
@@ -37,6 +49,9 @@ export const config = {
       destinationAssets: "destination-assets",
       thumbnails: "thumbnails",
       avatars: "avatars",
+      printPdfs: "print-pdfs",
+      previewImages: "preview-images",
+      exports: "exports",
     } as const,
     maxFileSize: 20 * 1024 * 1024,
     allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/tiff"] as const,
@@ -46,6 +61,15 @@ export const config = {
       thumbnail: "{bookId}/thumbnails/{sortOrder}.jpg",
       avatar: "{userId}/{filename}",
     },
+  },
+
+  production: {
+    dpi: 300,
+    bleedMm: 3,
+    safeMarginMm: 15,
+    maxRetries: 3,
+    defaultPageSize: { width: 9, height: 12 },
+    pollIntervalMs: 5000,
   },
 
   auth: {
@@ -63,9 +87,10 @@ export const config = {
   },
 
   featureFlags: {
-    enableCheckout: false,
+    enableCheckout: true,
     enableUpload: true,
     enableAuth: true,
+    enableProduction: true,
     enableAdminPanel: false,
   },
 } as const;

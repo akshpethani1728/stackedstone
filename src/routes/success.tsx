@@ -1,8 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useStudio } from "@/stores/studio";
+import { useEffect, useState } from "react";
+import { OrderService } from "@/services/order.service";
 import bookStack from "@/assets/book-stack.jpg";
+import type { Order } from "@/types/checkout";
 
 export const Route = createFileRoute("/success")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    order: typeof search.order === "string" ? search.order : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Your volume is on its way — Stacked Stone" },
@@ -13,8 +19,18 @@ export const Route = createFileRoute("/success")({
 });
 
 function SuccessPage() {
+  const { order: orderNumber } = Route.useSearch();
   const { state } = useStudio();
-  const orderNo = "SS-" + Math.random().toString(36).slice(2, 7).toUpperCase();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [orderError, setOrderError] = useState(false);
+
+  useEffect(() => {
+    if (orderNumber) {
+      OrderService.getByOrderNumber(orderNumber).then(setOrder).catch(() => setOrderError(true));
+    }
+  }, [orderNumber]);
+
+  const displayOrder = order?.order_number ?? (orderError ? orderNumber : null) ?? "";
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -30,7 +46,7 @@ function SuccessPage() {
         </div>
 
         <div className="md:col-span-6 md:order-1">
-          <p className="eyebrow reveal">Order {orderNo}</p>
+          {displayOrder && <p className="eyebrow reveal">Order {displayOrder}</p>}
           <h1 className="display reveal delay-1 mt-6 text-6xl md:text-8xl tracking-tight">
             Your book<br />is being<br /><span className="italic">made.</span>
           </h1>
@@ -52,10 +68,14 @@ function SuccessPage() {
           </div>
 
           <div className="reveal delay-4 mt-14 flex flex-wrap items-center gap-8">
-            <Link to="/account/orders/$id" params={{ id: orderNo }} className="btn-primary">
-              Track your book
-            </Link>
-            <Link to="/account" className="btn-ghost">Visit your library</Link>
+            {displayOrder ? (
+              <Link to="/account/orders/$id" params={{ id: displayOrder }} className="btn-primary">
+                Track your book
+              </Link>
+            ) : (
+              <Link to="/account" className="btn-primary">Visit your library</Link>
+            )}
+            <Link to="/account" className="btn-ghost">All your books</Link>
           </div>
         </div>
       </section>

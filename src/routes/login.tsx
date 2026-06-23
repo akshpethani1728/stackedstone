@@ -5,12 +5,16 @@ import { config } from "@/config";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({ meta: [{ title: "Sign in — Stacked Stone" }] }),
   component: LoginPage,
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,7 +26,7 @@ function LoginPage() {
     setLoading(true);
     try {
       await AuthService.signInWithEmail(email, password);
-      navigate({ to: config.auth.redirectAfterLogin });
+      navigate({ to: redirect ?? config.auth.redirectAfterLogin });
     } catch (err: any) {
       setError(err.message ?? "Failed to sign in");
     } finally {

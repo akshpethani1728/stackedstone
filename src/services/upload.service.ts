@@ -1,7 +1,7 @@
 import { getSupabaseClient } from "@/lib/supabase";
 import { fromSupabaseError, NotFoundError, StorageError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
-import { getStoragePath, getPublicUrl } from "@/lib/upload-utils";
+import { getStoragePath, getPublicUrl, getImageDimensions } from "@/lib/upload-utils";
 
 export const UploadService = {
   async uploadFile(
@@ -109,7 +109,7 @@ export const UploadService = {
       id,
       sort_order: index,
     }));
-    const { error } = await supabase.from("book_photos").upsert(updates as any);
+    const { error } = await supabase.from("book_photos").upsert(updates);
     if (error) throw fromSupabaseError(error);
     logger.info("UploadService", "Reordered photos", { count: photoIds.length });
   },
@@ -125,22 +125,6 @@ export const UploadService = {
     if (error) throw fromSupabaseError(error);
   },
 };
-
-async function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to decode image"));
-    };
-    img.src = url;
-  });
-}
 
 function extractStoragePath(publicUrl: string): string | null {
   try {

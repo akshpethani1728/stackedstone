@@ -8,12 +8,12 @@ export type Extras = {
 export type StudioState = {
   bookId?: string;
   title?: string;
-  destination?: any;
-  edition?: any;
-  cover?: any;
-  material?: any;
-  paper?: any;
-  pageCount?: any;
+  destination?: Destination;
+  edition?: Edition;
+  cover?: Cover;
+  material?: Material;
+  paper?: Paper;
+  pageCount?: PageCount;
   extras: Extras;
   photoCount: number;
   photos: string[];

@@ -4,12 +4,16 @@ import { AuthService } from "@/services/auth.service";
 import { config } from "@/config";
 
 export const Route = createFileRoute("/signup")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({ meta: [{ title: "Create account — Stacked Stone" }] }),
   component: SignupPage,
 });
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +26,7 @@ function SignupPage() {
     setLoading(true);
     try {
       await AuthService.signUp(email, password, name);
-      navigate({ to: config.auth.redirectAfterLogin });
+      navigate({ to: redirect ?? config.auth.redirectAfterLogin });
     } catch (err: any) {
       setError(err.message ?? "Failed to create account");
     } finally {
