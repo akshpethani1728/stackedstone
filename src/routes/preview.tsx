@@ -1,14 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { BookMockup } from "@/components/studio/BookMockup";
+import { BookPreview } from "@/components/studio/BookPreview";
 import { useStudio, type Extras } from "@/stores/studio";
 import { coversFor, extraOptions } from "@/data";
 import { subtotal } from "@/lib/pricing";
-import bookOpen from "@/assets/book-open.jpg";
-import shelf1 from "@/assets/shelf-1.jpg";
-import shelf2 from "@/assets/shelf-2.jpg";
-import bookStack from "@/assets/book-stack.jpg";
+import { BookGenerator } from "@/services/book-generator";
+import { config } from "@/config";
+import type { BookPreview as BookPreviewType, GenerationStatus } from "@/types/preview";
 
 export const Route = createFileRoute("/preview")({
   head: () => ({
@@ -17,25 +17,57 @@ export const Route = createFileRoute("/preview")({
       { name: "description", content: "A first look at your finished book." },
     ],
   }),
-  component: PreviewPage,
+  component: PreviewRoute,
 });
 
-const fallbackSpreads = [bookOpen, shelf1, shelf2, bookStack];
-
-function PreviewPage() {
+function PreviewRoute() {
   const navigate = useNavigate();
   const { state, patch } = useStudio();
-  const [page, setPage] = useState(0);
-  const title = state.title || state.destination?.name || "Untitled Volume";
+  const [preview, setPreview] = useState<BookPreviewType | null>(null);
+  const [status, setStatus] = useState<GenerationStatus>("idle");
+  const [error, setError] = useState<string | null>(null);
+  const genRef = useRef(false);
 
+  const bookId = state.bookId;
+  const title = state.title || state.destination?.name || "Untitled Volume";
   const cover = state.cover ?? coversFor(state.destination?.slug)[0];
   const coverPhoto = state.photos?.[0];
-  const spreads = useMemo(() => {
-    const userSpreads = state.photos ?? [];
-    return userSpreads.length >= 2 ? userSpreads.slice(0, 8) : fallbackSpreads;
-  }, [state.photos]);
+  const pageCount = state.pageCount?.pages ?? 48;
+  const totalPages = pageCount;
+
+  const doGenerate = useCallback(async () => {
+    if (!bookId) return;
+    setStatus("generating");
+    setError(null);
+    try {
+      const result = await BookGenerator.generate(bookId, totalPages);
+      setPreview(result);
+      setStatus("ready");
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to generate preview");
+      setStatus("error");
+    }
+  }, [bookId, totalPages]);
+
+  useEffect(() => {
+    if (!bookId || genRef.current) return;
+    genRef.current = true;
+
+    BookGenerator.loadOrGenerate(bookId, totalPages)
+      .then((p) => { setPreview(p); setStatus("ready"); })
+      .catch((err) => {
+        if (err?.message?.includes("no photos")) {
+          setStatus("idle");
+          return;
+        }
+        BookGenerator.generate(bookId, totalPages)
+          .then((p) => { setPreview(p); setStatus("ready"); })
+          .catch((e2) => { setError(e2?.message ?? "Failed"); setStatus("error"); });
+      });
+  }, [bookId, totalPages]);
 
   const total = subtotal(state);
+  const hasCheckout = config.featureFlags.enableCheckout;
 
   if (!cover) {
     return (
@@ -49,9 +81,17 @@ function PreviewPage() {
     );
   }
 
-  const toggleExtra = (slug: keyof Extras) => {
-    patch({ extras: { ...state.extras, [slug]: !state.extras[slug] } });
-  };
+  if (!bookId) {
+    return (
+      <StudioShell current="/preview">
+        <section className="container-edit pt-32 pb-40 text-center">
+          <p className="eyebrow">Step Eight · Preview</p>
+          <h1 className="display mt-6 text-5xl">Start a draft first.</h1>
+          <Link to="/destination" className="btn-primary mt-10 inline-flex">Begin</Link>
+        </section>
+      </StudioShell>
+    );
+  }
 
   return (
     <StudioShell current="/preview">
@@ -84,52 +124,75 @@ function PreviewPage() {
               <Spec label="Material" value={state.material?.name ?? "—"} />
               <Spec label="Paper" value={state.paper?.name ?? "—"} />
               <Spec label="Pages" value={state.pageCount ? `${state.pageCount.pages}` : "—"} />
+              <Spec label="Photos" value={`${state.photoCount || 0}`} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Spread viewer */}
-      <section className="bg-ink text-background py-20 md:py-28">
-        <div className="container-edit grid md:grid-cols-12 gap-16 items-center">
-          <div className="md:col-span-8 relative">
-            <div className="aspect-[16/11] bg-stone-warm/10 overflow-hidden book-shadow relative">
-              {spreads.map((s, i) => (
-                <img
-                  key={i}
-                  src={s}
-                  alt={`Spread ${i + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === page ? "opacity-100" : "opacity-0"}`}
-                />
-              ))}
-              <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-ink/30" />
+      {/* Generation loading */}
+      {status === "generating" && (
+        <section className="bg-ink text-background py-32">
+          <div className="container-edit text-center">
+            <div className="inline-flex items-center gap-4 mb-8">
+              <div className="w-8 h-8 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+              <span className="font-serif italic text-3xl text-background/80">Binding your book…</span>
             </div>
-            <div className="mt-8 flex items-center justify-between text-background/70">
-              <button onClick={() => setPage((p) => (p - 1 + spreads.length) % spreads.length)} className="btn-ghost !text-background/80">← Prev spread</button>
-              <span className="eyebrow !text-background/60">
-                Spread {String(page + 1).padStart(2, "0")} / {String(spreads.length).padStart(2, "0")}
-              </span>
-              <button onClick={() => setPage((p) => (p + 1) % spreads.length)} className="btn-ghost !text-background/80">Next spread →</button>
-            </div>
+            <p className="text-background/50 text-sm max-w-md mx-auto">
+              Arranging your photographs across {totalPages} pages.
+            </p>
           </div>
+        </section>
+      )}
 
-          <aside className="md:col-span-4 space-y-10">
-            <div>
-              <p className="eyebrow !text-background/60">Object</p>
-              <ul className="mt-4 space-y-3 text-background/85">
-                <li>· {state.edition?.size ?? "10 × 12 in"} · {state.edition?.name?.includes("Collector") ? "Portrait" : "Landscape"}</li>
-                <li>· {state.paper?.weight ?? "170 gsm"} {state.paper?.name ?? "Premium Matte"}</li>
-                <li>· Smyth-sewn signatures · lay-flat binding</li>
-                <li>· {state.material?.name ?? "Linen Hardcover"}, debossed spine</li>
-                <li>· Printed in India · arrives in 10–14 days</li>
-              </ul>
-            </div>
-            <Link to="/upload" className="btn-ghost !text-background/70 inline-flex">← Revise photographs</Link>
-          </aside>
-        </div>
-      </section>
+      {/* Error state */}
+      {status === "error" && (
+        <section className="bg-ink text-background py-32">
+          <div className="container-edit text-center">
+            <p className="font-serif italic text-3xl text-background/80 mb-4">Something went wrong</p>
+            <p className="text-background/50 text-sm max-w-md mx-auto mb-8">{error}</p>
+            <button onClick={doGenerate} className="btn-ghost !text-background/80">
+              Try again
+            </button>
+          </div>
+        </section>
+      )}
 
-      {/* Extras + checkout */}
+      {/* No photos state */}
+      {status === "idle" && (
+        <section className="bg-ink text-background py-32">
+          <div className="container-edit text-center">
+            <p className="font-serif italic text-3xl text-background/80 mb-4">
+              No photographs yet
+            </p>
+            <p className="text-background/50 text-sm max-w-md mx-auto mb-8">
+              Upload your photographs before generating the preview.
+            </p>
+            <Link to="/upload" className="btn-ghost !text-background/80 inline-flex">
+              Add photographs →
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Book preview */}
+      {status === "ready" && preview && (
+        <section>
+          <BookPreview preview={preview} coverUrl={coverPhoto} />
+
+          <div className="container-edit py-10 flex items-center justify-between border-b border-border">
+            <Link to="/upload" className="btn-ghost text-muted-foreground">← Revise photographs</Link>
+            <button
+              onClick={doGenerate}
+              className="text-[0.6rem] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Regenerate preview
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Extras + pricing */}
       <section className="container-edit py-20 md:py-28 grid md:grid-cols-12 gap-16">
         <div className="md:col-span-7">
           <p className="eyebrow">Add to your volume</p>
@@ -144,7 +207,7 @@ function PreviewPage() {
               return (
                 <li key={e.slug}>
                   <button
-                    onClick={() => toggleExtra(e.slug as keyof Extras)}
+                    onClick={() => toggleExtra(e.slug as keyof Extras, patch, state.extras)}
                     className="w-full py-8 flex items-center justify-between gap-8 group"
                   >
                     <div className="text-left">
@@ -200,9 +263,15 @@ function PreviewPage() {
             </div>
             <p className="text-xs text-muted-foreground mt-2">Inclusive of all taxes. Shipping across India — ₹499.</p>
 
-            <button onClick={() => navigate({ to: "/checkout" })} className="btn-primary mt-8 w-full">
-              Proceed to checkout
-            </button>
+            {hasCheckout ? (
+              <button onClick={() => navigate({ to: "/checkout" })} className="btn-primary mt-8 w-full">
+                Proceed to checkout
+              </button>
+            ) : (
+              <button disabled className="btn-primary mt-8 w-full opacity-40 cursor-not-allowed">
+                Checkout coming soon
+              </button>
+            )}
             <p className="mt-6 text-xs text-muted-foreground italic leading-relaxed">
               Estimated delivery: 10–14 days. Printed in India, finished by hand.
             </p>
@@ -211,6 +280,10 @@ function PreviewPage() {
       </section>
     </StudioShell>
   );
+}
+
+function toggleExtra(slug: string, patch: any, extras: Extras) {
+  patch({ extras: { ...extras, [slug]: !(extras as any)[slug] } });
 }
 
 function Spec({ label, value }: { label: string; value: string }) {
