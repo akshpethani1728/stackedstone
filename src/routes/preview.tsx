@@ -111,31 +111,37 @@ function PreviewRoute() {
           <div className="md:col-span-7">
             <BookMockup
               cover={cover}
-              destination={state.destination}
-              edition={state.edition}
+              destination={destination}
+              edition={edition}
               title={title}
               photo={coverPhoto}
               size="lg"
             />
           </div>
           <div className="md:col-span-5">
-            <p className="eyebrow">Step Eight · The First Look</p>
+            <p className="eyebrow">Step Eight · The First Look{isDemo ? " · Sample" : ""}</p>
             <h1 className="display mt-6 text-5xl md:text-6xl tracking-tight">
               {title},<br /><span className="italic">in your hands.</span>
             </h1>
             <p className="mt-6 text-muted-foreground leading-relaxed max-w-md">
-              This is your book — your photograph on the cover, your name on the spine. Turn the spreads
-              below to see how it will read.
+              {isDemo
+                ? "A sample volume, arranged from our archive. Begin a draft to see your own photographs bound this way."
+                : "This is your book — your photograph on the cover, your name on the spine. Turn the spreads below to see how it will read."}
             </p>
             <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 max-w-md">
-              <Spec label="Edition" value={state.edition?.name ?? "—"} />
-              <Spec label="Destination" value={state.destination?.name ?? "—"} />
-              <Spec label="Cover" value={cover.name} />
-              <Spec label="Material" value={state.material?.name ?? "—"} />
-              <Spec label="Paper" value={state.paper?.name ?? "—"} />
-              <Spec label="Pages" value={state.pageCount ? `${state.pageCount.pages}` : "—"} />
-              <Spec label="Photos" value={`${state.photoCount || 0}`} />
+              <Spec label="Edition" value={edition?.name ?? "—"} />
+              <Spec label="Destination" value={destination?.name ?? "—"} />
+              <Spec label="Cover" value={cover?.name ?? "—"} />
+              <Spec label="Material" value={material?.name ?? "—"} />
+              <Spec label="Paper" value={paper?.name ?? "—"} />
+              <Spec label="Pages" value={pageCountObj ? `${pageCountObj.pages}` : "—"} />
+              <Spec label="Photos" value={`${isDemo ? "Sample" : state.photoCount || 0}`} />
             </div>
+            {isDemo && (
+              <Link to="/destination" className="btn-primary mt-10 inline-flex">Begin your own</Link>
+            )}
+          </div>
+
           </div>
         </div>
       </section>
