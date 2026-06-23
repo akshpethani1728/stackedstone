@@ -46,8 +46,13 @@ function DestinationPage() {
   const pick = async (d: D) => {
     const { img: _i, span: _s, ratio: _r, ...rest } = d;
     patch({ destination: rest, cover: undefined });
-    if (!bookId && destIds?.[d.slug]) {
-      await createDraft();
+    if (!bookId) {
+      try {
+        await createDraft();
+      } catch {
+        navigate({ to: "/login", search: { redirect: "/destination" } });
+        return;
+      }
     }
     navigate({ to: "/create" });
   };
