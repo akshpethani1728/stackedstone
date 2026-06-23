@@ -258,15 +258,16 @@ function PreviewRoute() {
           <div className="border border-border p-10 bg-beige/30">
             <p className="eyebrow">Your volume</p>
             <h3 className="font-serif italic text-3xl mt-3">{title}</h3>
-            <p className="text-muted-foreground mt-1">{state.destination?.region ?? "—"}</p>
+            <p className="text-muted-foreground mt-1">{destination?.region ?? "—"}</p>
 
             <div className="mt-10 border-t border-border pt-8 space-y-3 text-sm">
-              <Row k="Edition"     v={state.edition?.name}     a={`₹${state.edition?.price ?? 0}`} />
-              <Row k="Cover"       v={cover.name} />
-              <Row k="Material"    v={state.material?.name}    a={state.material?.priceDelta ? `+ ₹${state.material.priceDelta}` : "Included"} />
-              <Row k="Paper"       v={state.paper?.name}       a={state.paper?.priceDelta ? `+ ₹${state.paper.priceDelta}` : "Included"} />
-              <Row k="Pages"       v={state.pageCount ? `${state.pageCount.pages} pages` : "—"} a={state.pageCount?.priceDelta ? `+ ₹${state.pageCount.priceDelta}` : "Included"} />
-              <Row k="Photographs" v={`${state.photoCount || 0}`} />
+              <Row k="Edition"     v={edition?.name}     a={`₹${edition?.price ?? 0}`} />
+              <Row k="Cover"       v={cover?.name} />
+              <Row k="Material"    v={material?.name}    a={material?.priceDelta ? `+ ₹${material.priceDelta}` : "Included"} />
+              <Row k="Paper"       v={paper?.name}       a={paper?.priceDelta ? `+ ₹${paper.priceDelta}` : "Included"} />
+              <Row k="Pages"       v={pageCountObj ? `${pageCountObj.pages} pages` : "—"} a={pageCountObj?.priceDelta ? `+ ₹${pageCountObj.priceDelta}` : "Included"} />
+              <Row k="Photographs" v={`${isDemo ? "Sample" : state.photoCount || 0}`} />
+
               {extraOptions.filter((e) => state.extras[e.slug as keyof Extras]).map((e) => (
                 <Row key={e.slug} k="Extra" v={e.name} a={`+ ₹${e.price}`} />
               ))}
