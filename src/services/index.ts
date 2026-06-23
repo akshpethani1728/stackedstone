@@ -1,15 +1,7 @@
-export {
-  getAll as getAllDestinations,
-  getBySlug as getDestinationBySlug,
-  getCategories as getDestinationCategories,
-} from "./destinations.service";
-
-export {
-  getEditions,
-  getCovers,
-  getMaterials,
-  getPapers,
-  getPageCounts,
-  coverCollections,
-  extraOptions,
-} from "./catalogue.service";
+export { BookService } from "./book.service";
+export { StorageService } from "./storage.service";
+export { OrderService } from "./order.service";
+export { UploadService } from "./upload.service";
+export { NotificationService } from "./notification.service";
+export { AuthService } from "./auth.service";
+export { DestinationService } from "./destination.service";

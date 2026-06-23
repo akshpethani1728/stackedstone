@@ -553,25 +553,29 @@ The database types are separate from the frontend UI types (`types/studio.ts`, `
 
 ---
 
-## Migration Path from Current State
+## Implementation Status
 
-### Phase 1: Data Model (current)
-- Types defined in `src/types/database/`
-- No runtime implementation
+### ✅ Completed (Phase 3)
+- **Schema migrated** — all 14 tables, 10 enums, 16 relationships, indexes, triggers in `supabase/migrations/00001_schema.sql`
+- **Storage buckets created** — 6 buckets (`book-images`, `book-previews`, `covers`, `destination-assets`, `thumbnails`, `avatars`) in `00002_storage.sql`
+- **RLS enabled** — 30+ policies across all tables and storage buckets in `00003_rls.sql`
+- **Auth configured** — Supabase Auth with email + Google (future-ready), sync trigger from `auth.users` to `public.users`
+- **Seed data ready** — `supabase/seed.sql` with editions, materials, papers, page counts
+- **Supabase client library** — `src/lib/supabase/` with browser, SSR, and service-role clients
+- **Service layer** — 7 service skeletons (`BookService`, `StorageService`, `OrderService`, `UploadService`, `NotificationService`, `AuthService`, `DestinationService`)
+- **Validation schemas** — Zod schemas for books, orders, addresses, users, uploads
+- **Error handling** — centralized `AppError` system with typed error codes and Supabase error mapping
+- **Logging** — structured logger with levels, context, and timestamp
+- **Configuration** — all env vars, constants, limits, feature flags in `config/index.ts`
+- **Auth middleware** — server-side route protection via `auth-middleware.ts`
+- **Router context** — extended with `user` and `session` for route-level auth
+- **Documentation** — ARCHITECTURE.md and DATABASE.md updated
 
-### Phase 2: Service Layer
-- `src/services/*` functions switch from `data/` imports to Supabase queries
-- Example: `destinations.service.ts` `getAll()` queries `supabase.from("destinations").select("*")`
-
-### Phase 3: Storage
-- Supabase Storage buckets created for covers, textures, user photos
-- Image URLs in `data/` replaced with Storage bucket paths
-
-### Phase 4: State & Orders
+### 🔜 Phase 4 (next): State & Orders
 - `useStudio()` persists to Supabase instead of sessionStorage
 - Checkout creates real Order + OrderItem + Book records
 - Payment integration triggers job creation
 
-### Phase 5: Jobs & Notifications
+### 🔜 Phase 5 (future): Jobs & Notifications
 - Background workers process Job queue
 - Notification records sent via email provider
