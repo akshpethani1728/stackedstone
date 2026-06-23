@@ -1,12 +1,33 @@
+export type Extras = {
+  giftWrap: boolean;
+  giftMessage: string;
+  storageBox: boolean;
+  extraCopy: boolean;
+};
+
+export type StudioState = {
+  bookId?: string;
+  title?: string;
+  destination?: any;
+  edition?: any;
+  cover?: any;
+  material?: any;
+  paper?: any;
+  pageCount?: any;
+  extras: Extras;
+  photoCount: number;
+  photos: string[];
+};
+
 export type Edition = {
-  slug: "weekend" | "journey" | "explorer" | "collector";
+  slug: string;
   name: string;
   pages: string;
-  size: string;
   price: number;
+  size: string;
   ideal: string;
-  photoEstimate: string;
   description: string;
+  photoEstimate: string;
 };
 
 export type Destination = {
@@ -32,7 +53,7 @@ export type Material = {
   description: string;
   priceDelta: number;
   swatch: string;
-  texture: string;
+  texture?: string;
 };
 
 export type Paper = {
@@ -42,7 +63,7 @@ export type Paper = {
   finish: string;
   bestFor: string;
   priceDelta: number;
-  texture: string;
+  texture?: string;
 };
 
 export type PageCount = {
@@ -51,24 +72,4 @@ export type PageCount = {
   recommended: [number, number];
   ideal: string;
   priceDelta: number;
-};
-
-export type Extras = {
-  giftWrap: boolean;
-  giftMessage: string;
-  storageBox: boolean;
-  extraCopy: boolean;
-};
-
-export type StudioState = {
-  destination?: Destination;
-  edition?: Edition;
-  cover?: Cover;
-  material?: Material;
-  paper?: Paper;
-  pageCount?: PageCount;
-  photos: string[];
-  photoCount: number;
-  title?: string;
-  extras: Extras;
 };

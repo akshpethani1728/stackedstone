@@ -1,9 +1,8 @@
 import { getSupabaseClient } from "@/lib/supabase";
-
 import { fromSupabaseError, NotFoundError } from "@/lib/errors";
 
 export const DestinationService = {
-  async getAll() {
+  async getAll(): Promise<any[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("destinations")
@@ -15,7 +14,7 @@ export const DestinationService = {
     return data ?? [];
   },
 
-  async getBySlug(slug: string) {
+  async getBySlug(slug: string): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("destinations")
@@ -28,7 +27,7 @@ export const DestinationService = {
     return data;
   },
 
-  async getCovers(destinationId: string) {
+  async getCovers(destinationId: string): Promise<any[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("destination_cover_designs")
@@ -37,10 +36,10 @@ export const DestinationService = {
       .order("sort_order", { ascending: true });
 
     if (error) throw fromSupabaseError(error);
-    return data?.map((d) => d.cover_design) ?? [];
+    return data?.map((d: any) => d.cover_design) ?? [];
   },
 
-  async getByCategory(category: string) {
+  async getByCategory(category: string): Promise<any[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("destinations")

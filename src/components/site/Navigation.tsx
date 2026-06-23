@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { AuthService } from "@/services/auth.service";
 
 const links = [
   { label: "Explore", to: "/explore" as const },
@@ -11,8 +12,13 @@ const links = [
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<unknown | null>(null);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+
+  useEffect(() => {
+    AuthService.getUser().then(setUser).catch(() => setUser(null));
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -54,41 +60,43 @@ export function Navigation() {
         </nav>
 
         <div className="hidden md:flex items-center gap-8">
-          <Link to="/account" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
-            Account
-          </Link>
+          {user ? (
+            <Link to="/account" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
+              Library
+            </Link>
+          ) : (
+            <Link to="/login" className="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/70 hover:text-foreground">
+              Sign in
+            </Link>
+          )}
           <Link to="/destination" className="btn-primary !py-3 !px-5">
-            Create yours
+            Begin a book
           </Link>
         </div>
 
-        <button
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="md:hidden h-9 w-9 flex flex-col items-center justify-center gap-[5px]"
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className={`block h-px w-6 bg-foreground transition-transform ${open ? "translate-y-[3px] rotate-45" : ""}`} />
-          <span className={`block h-px w-6 bg-foreground transition-transform ${open ? "-translate-y-[3px] -rotate-45" : ""}`} />
+        {/* Mobile hamburger */}
+        <button onClick={() => setOpen(!open)} className="md:hidden relative w-7 h-5 flex flex-col justify-center">
+          <span className={`block h-px bg-current transition-all duration-300 ${open ? "rotate-45 translate-y-0" : "-translate-y-1.5"}`} />
+          <span className={`block h-px bg-current transition-all duration-300 ${open ? "opacity-0" : "opacity-100"}`} />
+          <span className={`block h-px bg-current transition-all duration-300 ${open ? "-rotate-45 translate-y-0" : "translate-y-1.5"}`} />
         </button>
       </div>
 
-      {open && (
-        <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
-          <div className="container-edit py-10 flex flex-col gap-6">
-            {links.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className="font-serif text-4xl tracking-tight"
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link to="/account" className="font-serif text-2xl text-muted-foreground mt-2">Account</Link>
-            <Link to="/destination" className="btn-primary mt-6 w-fit">Create yours</Link>
-          </div>
+      {/* Mobile menu */}
+      <div className={`md:hidden overflow-hidden transition-all duration-500 ${open ? "max-h-96" : "max-h-0"}`}>
+        <div className="container-edit pb-8 space-y-6">
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} className="block text-[0.72rem] uppercase tracking-[0.28em]">{l.label}</Link>
+          ))}
+          <hr className="border-border/60" />
+          {user ? (
+            <Link to="/account" className="block text-[0.72rem] uppercase tracking-[0.28em]">Library</Link>
+          ) : (
+            <Link to="/login" className="block text-[0.72rem] uppercase tracking-[0.28em]">Sign in</Link>
+          )}
+          <Link to="/destination" className="btn-primary inline-flex">Begin a book</Link>
         </div>
-      )}
+      </div>
     </header>
   );
 }

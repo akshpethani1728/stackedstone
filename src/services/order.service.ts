@@ -1,10 +1,8 @@
 import { getSupabaseClient } from "@/lib/supabase";
-
 import { fromSupabaseError, NotFoundError } from "@/lib/errors";
-import { logger } from "@/lib/logger";
 
 export const OrderService = {
-  async getById(id: string) {
+  async getById(id: string): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("orders")
@@ -17,7 +15,7 @@ export const OrderService = {
     return data;
   },
 
-  async getByUser(userId: string) {
+  async getByUser(userId: string): Promise<any[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("orders")
@@ -29,7 +27,7 @@ export const OrderService = {
     return data ?? [];
   },
 
-  async getByOrderNumber(orderNumber: string) {
+  async getByOrderNumber(orderNumber: string): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("orders")
@@ -42,7 +40,7 @@ export const OrderService = {
     return data;
   },
 
-  async create(input: Record<string, unknown>) {
+  async create(input: Record<string, unknown>): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("orders")
@@ -51,11 +49,10 @@ export const OrderService = {
       .single();
 
     if (error) throw fromSupabaseError(error);
-    logger.info("OrderService", "Order created", { id: data.id });
     return data;
   },
 
-  async updateStatus(id: string, status: string) {
+  async updateStatus(id: string, status: string): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("orders")

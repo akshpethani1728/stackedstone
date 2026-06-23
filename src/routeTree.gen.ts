@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as PaperRouteImport } from './routes/paper'
 import { Route as PagesRouteImport } from './routes/pages'
 import { Route as MaterialRouteImport } from './routes/material'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DestinationRouteImport } from './routes/destination'
@@ -26,12 +28,14 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalShippingRouteImport } from './routes/legal.shipping'
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as DestinationsSlugRouteImport } from './routes/destinations.$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountDraftsRouteImport } from './routes/account.drafts'
@@ -46,6 +50,11 @@ const UploadRoute = UploadRouteImport.update({
 const SuccessRoute = SuccessRouteImport.update({
   id: '/success',
   path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PreviewRoute = PreviewRouteImport.update({
@@ -66,6 +75,11 @@ const PagesRoute = PagesRouteImport.update({
 const MaterialRoute = MaterialRouteImport.update({
   id: '/material',
   path: '/material',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -123,6 +137,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -151,6 +170,11 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
 const DestinationsSlugRoute = DestinationsSlugRouteImport.update({
   id: '/destinations/$slug',
   path: '/destinations/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountProfileRoute = AccountProfileRouteImport.update({
@@ -191,21 +215,25 @@ export interface FileRoutesByFullPath {
   '/destination': typeof DestinationRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pages': typeof PagesRoute
   '/paper': typeof PaperRoute
   '/preview': typeof PreviewRoute
+  '/signup': typeof SignupRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
   '/account/drafts': typeof AccountDraftsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/profile': typeof AccountProfileRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/shipping': typeof LegalShippingRoute
   '/legal/terms': typeof LegalTermsRoute
   '/account/': typeof AccountIndexRoute
+  '/auth/': typeof AuthIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
 }
@@ -220,20 +248,24 @@ export interface FileRoutesByTo {
   '/destination': typeof DestinationRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pages': typeof PagesRoute
   '/paper': typeof PaperRoute
   '/preview': typeof PreviewRoute
+  '/signup': typeof SignupRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
   '/account/drafts': typeof AccountDraftsRoute
   '/account/profile': typeof AccountProfileRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/shipping': typeof LegalShippingRoute
   '/legal/terms': typeof LegalTermsRoute
   '/account': typeof AccountIndexRoute
+  '/auth': typeof AuthIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders': typeof AccountOrdersIndexRoute
 }
@@ -250,21 +282,25 @@ export interface FileRoutesById {
   '/destination': typeof DestinationRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pages': typeof PagesRoute
   '/paper': typeof PaperRoute
   '/preview': typeof PreviewRoute
+  '/signup': typeof SignupRoute
   '/success': typeof SuccessRoute
   '/upload': typeof UploadRoute
   '/account/drafts': typeof AccountDraftsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/profile': typeof AccountProfileRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/shipping': typeof LegalShippingRoute
   '/legal/terms': typeof LegalTermsRoute
   '/account/': typeof AccountIndexRoute
+  '/auth/': typeof AuthIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
 }
@@ -282,21 +318,25 @@ export interface FileRouteTypes {
     | '/destination'
     | '/explore'
     | '/faq'
+    | '/login'
     | '/material'
     | '/pages'
     | '/paper'
     | '/preview'
+    | '/signup'
     | '/success'
     | '/upload'
     | '/account/drafts'
     | '/account/orders'
     | '/account/profile'
+    | '/auth/callback'
     | '/destinations/$slug'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/shipping'
     | '/legal/terms'
     | '/account/'
+    | '/auth/'
     | '/account/orders/$id'
     | '/account/orders/'
   fileRoutesByTo: FileRoutesByTo
@@ -311,20 +351,24 @@ export interface FileRouteTypes {
     | '/destination'
     | '/explore'
     | '/faq'
+    | '/login'
     | '/material'
     | '/pages'
     | '/paper'
     | '/preview'
+    | '/signup'
     | '/success'
     | '/upload'
     | '/account/drafts'
     | '/account/profile'
+    | '/auth/callback'
     | '/destinations/$slug'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/shipping'
     | '/legal/terms'
     | '/account'
+    | '/auth'
     | '/account/orders/$id'
     | '/account/orders'
   id:
@@ -340,21 +384,25 @@ export interface FileRouteTypes {
     | '/destination'
     | '/explore'
     | '/faq'
+    | '/login'
     | '/material'
     | '/pages'
     | '/paper'
     | '/preview'
+    | '/signup'
     | '/success'
     | '/upload'
     | '/account/drafts'
     | '/account/orders'
     | '/account/profile'
+    | '/auth/callback'
     | '/destinations/$slug'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/shipping'
     | '/legal/terms'
     | '/account/'
+    | '/auth/'
     | '/account/orders/$id'
     | '/account/orders/'
   fileRoutesById: FileRoutesById
@@ -371,17 +419,21 @@ export interface RootRouteChildren {
   DestinationRoute: typeof DestinationRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
+  LoginRoute: typeof LoginRoute
   MaterialRoute: typeof MaterialRoute
   PagesRoute: typeof PagesRoute
   PaperRoute: typeof PaperRoute
   PreviewRoute: typeof PreviewRoute
+  SignupRoute: typeof SignupRoute
   SuccessRoute: typeof SuccessRoute
   UploadRoute: typeof UploadRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   DestinationsSlugRoute: typeof DestinationsSlugRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalRefundRoute: typeof LegalRefundRoute
   LegalShippingRoute: typeof LegalShippingRoute
   LegalTermsRoute: typeof LegalTermsRoute
+  AuthIndexRoute: typeof AuthIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -398,6 +450,13 @@ declare module '@tanstack/react-router' {
       path: '/success'
       fullPath: '/success'
       preLoaderRoute: typeof SuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/preview': {
@@ -426,6 +485,13 @@ declare module '@tanstack/react-router' {
       path: '/material'
       fullPath: '/material'
       preLoaderRoute: typeof MaterialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -505,6 +571,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account/': {
       id: '/account/'
       path: '/'
@@ -545,6 +618,13 @@ declare module '@tanstack/react-router' {
       path: '/destinations/$slug'
       fullPath: '/destinations/$slug'
       preLoaderRoute: typeof DestinationsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/profile': {
@@ -628,17 +708,21 @@ const rootRouteChildren: RootRouteChildren = {
   DestinationRoute: DestinationRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
+  LoginRoute: LoginRoute,
   MaterialRoute: MaterialRoute,
   PagesRoute: PagesRoute,
   PaperRoute: PaperRoute,
   PreviewRoute: PreviewRoute,
+  SignupRoute: SignupRoute,
   SuccessRoute: SuccessRoute,
   UploadRoute: UploadRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   DestinationsSlugRoute: DestinationsSlugRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalRefundRoute: LegalRefundRoute,
   LegalShippingRoute: LegalShippingRoute,
   LegalTermsRoute: LegalTermsRoute,
+  AuthIndexRoute: AuthIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

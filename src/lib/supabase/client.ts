@@ -1,12 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-import type { Database } from "./types";
-
-let client: ReturnType<typeof createBrowserClient<Database>> | null = null;
-
 export function getSupabaseClient() {
-  if (client) return client;
-
   const url = import.meta.env.VITE_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -16,6 +10,5 @@ export function getSupabaseClient() {
     );
   }
 
-  client = createBrowserClient<Database>(url, anonKey);
-  return client;
+  return createBrowserClient(url, anonKey);
 }

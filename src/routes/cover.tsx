@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
+import { SaveIndicator } from "@/components/studio/SaveIndicator";
 import { BookMockup } from "@/components/studio/BookMockup";
 import { coversFor } from "@/data";
 import { useStudio } from "@/stores/studio";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/cover")({
 
 function CoverPage() {
   const navigate = useNavigate();
-  const { state, patch } = useStudio();
+  const { state, patch, saveStatus } = useStudio();
   const covers = coversFor(state.destination?.slug);
 
   if (!state.destination) {
@@ -33,6 +34,7 @@ function CoverPage() {
 
   return (
     <StudioShell current="/cover">
+      <SaveIndicator status={saveStatus} />
       <section className="container-edit pt-24 md:pt-32 pb-12">
         <div className="grid md:grid-cols-12 gap-10 items-end">
           <div className="md:col-span-8">

@@ -1,10 +1,9 @@
 import { getSupabaseClient } from "@/lib/supabase";
-
 import { fromSupabaseError, NotFoundError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 
 export const UploadService = {
-  async addPhoto(bookId: string, storageUrl: string, sortOrder: number) {
+  async addPhoto(bookId: string, storageUrl: string, sortOrder: number): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("book_photos")
@@ -16,7 +15,7 @@ export const UploadService = {
     return data;
   },
 
-  async removePhoto(photoId: string) {
+  async removePhoto(photoId: string): Promise<void> {
     const supabase = getSupabaseClient();
     const { error } = await supabase
       .from("book_photos")
@@ -26,7 +25,7 @@ export const UploadService = {
     if (error) throw fromSupabaseError(error);
   },
 
-  async reorderPhotos(bookId: string, photoIds: string[]) {
+  async reorderPhotos(bookId: string, photoIds: string[]): Promise<void> {
     const supabase = getSupabaseClient();
     const updates = photoIds.map((id, index) => ({
       id,
@@ -34,11 +33,11 @@ export const UploadService = {
       sort_order: index,
     }));
 
-    const { error } = await supabase.from("book_photos").upsert(updates);
+    const { error } = await supabase.from("book_photos").upsert(updates as any);
     if (error) throw fromSupabaseError(error);
   },
 
-  async updatePhotoCount(bookId: string) {
+  async updatePhotoCount(bookId: string): Promise<void> {
     const supabase = getSupabaseClient();
     const { count, error: countError } = await supabase
       .from("book_photos")

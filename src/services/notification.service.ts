@@ -1,16 +1,8 @@
 import { getSupabaseClient } from "@/lib/supabase";
-
 import { fromSupabaseError } from "@/lib/errors";
 
 export const NotificationService = {
-  async create(input: {
-    user_id: string;
-    type: "order_confirmation" | "shipping_update" | "delivery_confirmation" | "promotional" | "job_failed";
-    channel: "email" | "in_app";
-    subject: string;
-    body: string;
-    data?: Record<string, unknown>;
-  }) {
+  async create(input: Record<string, unknown>): Promise<any> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("notifications")
@@ -22,7 +14,7 @@ export const NotificationService = {
     return data;
   },
 
-  async getByUser(userId: string) {
+  async getByUser(userId: string): Promise<any[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("notifications")
@@ -34,7 +26,7 @@ export const NotificationService = {
     return data ?? [];
   },
 
-  async markAsRead(id: string) {
+  async markAsRead(id: string): Promise<void> {
     const supabase = getSupabaseClient();
     const { error } = await supabase
       .from("notifications")
@@ -44,7 +36,7 @@ export const NotificationService = {
     if (error) throw fromSupabaseError(error);
   },
 
-  async markAllAsRead(userId: string) {
+  async markAllAsRead(userId: string): Promise<void> {
     const supabase = getSupabaseClient();
     const { error } = await supabase
       .from("notifications")

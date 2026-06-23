@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
+import { SaveIndicator } from "@/components/studio/SaveIndicator";
 import { editions } from "@/data";
 import { useStudio } from "@/stores/studio";
+import { useEditionIds } from "@/hooks/use-catalogue-ids";
 import bookIceland from "@/assets/book-iceland.jpg";
 import bookKyoto from "@/assets/book-kyoto.jpg";
 import bookMorocco from "@/assets/book-morocco.jpg";
@@ -21,10 +23,12 @@ const covers = [bookIceland, bookKyoto, bookMorocco, bookStack];
 
 function CreatePage() {
   const navigate = useNavigate();
-  const { state, patch } = useStudio();
+  const { state, patch, saveStatus } = useStudio();
+  const editionIds = useEditionIds();
 
   return (
     <StudioShell current="/create">
+      <SaveIndicator status={saveStatus} />
       <section className="container-edit pt-24 md:pt-32 pb-20">
         <p className="eyebrow reveal">Step Two · The Edition</p>
         <h1 className="display reveal delay-1 mt-6 text-5xl md:text-7xl lg:text-[5.5rem] max-w-3xl">

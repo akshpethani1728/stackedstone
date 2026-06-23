@@ -1,9 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
-import { parseCookies, setCookie, deleteCookie } from "vinxi/http";
 
-import type { Database } from "./types";
-
-let serverClient: ReturnType<typeof createServerClient<Database>> | null = null;
+let serverClient: ReturnType<typeof createServerClient> | null = null;
 
 export function getSupabaseServerClient() {
   if (serverClient) return serverClient;
@@ -17,16 +14,12 @@ export function getSupabaseServerClient() {
     );
   }
 
-  serverClient = createServerClient<Database>(url, anonKey, {
+  serverClient = createServerClient(url, anonKey, {
     cookies: {
       getAll() {
-        return parseCookies();
+        return [];
       },
-      setAll(cookies) {
-        for (const { name, value, options } of cookies) {
-          setCookie(name, value, options);
-        }
-      },
+      setAll() {},
     },
   });
 

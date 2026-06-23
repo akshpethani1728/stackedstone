@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { useStudio } from "@/stores/studio";
+import { useDestinationIds } from "@/hooks/use-catalogue-ids";
+import { SaveIndicator } from "@/components/studio/SaveIndicator";
 import type { Destination } from "@/types";
 import bali from "@/assets/dest-bali.jpg";
 import kashmir from "@/assets/dest-kashmir.jpg";
@@ -38,17 +40,21 @@ const destinations: D[] = [
 
 function DestinationPage() {
   const navigate = useNavigate();
-  const { patch } = useStudio();
+  const { state, patch, createDraft, bookId, saveStatus } = useStudio();
+  const destIds = useDestinationIds();
 
-  const pick = (d: D) => {
+  const pick = async (d: D) => {
     const { img: _i, span: _s, ratio: _r, ...rest } = d;
-    // Clear any previous cover when destination changes — covers are destination-specific
     patch({ destination: rest, cover: undefined });
+    if (!bookId && destIds?.[d.slug]) {
+      await createDraft();
+    }
     navigate({ to: "/create" });
   };
 
   return (
     <StudioShell current="/destination">
+      <SaveIndicator status={saveStatus} />
       <section className="container-edit pt-24 md:pt-32 pb-16">
         <div className="grid md:grid-cols-12 gap-10 items-end">
           <div className="md:col-span-8">
@@ -87,7 +93,6 @@ function DestinationPage() {
             </button>
           ))}
         </div>
-
         <p className="mt-24 text-center text-muted-foreground italic">
           More chapters being written — Vietnam, Patagonia, Lisbon, Hokkaido.
         </p>
