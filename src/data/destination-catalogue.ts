@@ -36,7 +36,19 @@ export const REGIONS: { id: RegionId; label: string }[] = [
   { id: "oceania", label: "Oceania" },
 ];
 
-const p = (img: string) => img;
+// Per-slug premium images (eagerly imported, URL only). Falls back to the
+// region default below when a slug-specific image hasn't been generated yet.
+const slugImages = import.meta.glob("../assets/destinations/*.jpg", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
+const slugImageBySlug: Record<string, string> = {};
+for (const [path, url] of Object.entries(slugImages)) {
+  const slug = path.split("/").pop()!.replace(/\.jpg$/, "");
+  slugImageBySlug[slug] = url;
+}
+const p = (slug: string, fallback: string) => slugImageBySlug[slug] ?? fallback;
 
 export const destinations: CatalogueDestination[] = [
   // ─── INDIA (30) ───────────────────────────────────────────────
