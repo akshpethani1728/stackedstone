@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { useStudio } from "@/stores/studio";
 import { useDestinationIds } from "@/hooks/use-catalogue-ids";
@@ -24,27 +25,70 @@ export const Route = createFileRoute("/destination")({
   component: DestinationPage,
 });
 
-type D = Destination & { img: string; span?: string; ratio?: string };
+type D = Destination & { img: string };
 
 const destinations: D[] = [
-  { slug: "kashmir",   name: "Kashmir",   region: "India · Himalayas",    tagline: "Houseboats and slow water.",       img: kashmir,   span: "md:col-span-7", ratio: "aspect-[16/10]" },
-  { slug: "japan",     name: "Japan",     region: "Honshu",               tagline: "A study in stillness.",            img: kyoto,     span: "md:col-span-5", ratio: "aspect-[4/5]" },
-  { slug: "goa",       name: "Goa",       region: "Konkan coast",         tagline: "Salt, palms, slow Sundays.",       img: goa,       span: "md:col-span-5", ratio: "aspect-[4/5]" },
-  { slug: "rajasthan", name: "Rajasthan", region: "Pink City & beyond",   tagline: "Light through carved sandstone.",  img: rajasthan, span: "md:col-span-7", ratio: "aspect-[16/10]" },
-  { slug: "bali",      name: "Bali",      region: "Ubud highlands",       tagline: "Terraces wrapped in fog.",         img: bali,      span: "md:col-span-6", ratio: "aspect-[4/3]" },
-  { slug: "kerala",    name: "Kerala",    region: "Backwaters",           tagline: "A morning that lasts all day.",    img: kerala,    span: "md:col-span-6", ratio: "aspect-[4/3]" },
-  { slug: "ladakh",    name: "Ladakh",    region: "High Himalaya",        tagline: "Where the road simply stops.",     img: ladakh,    span: "md:col-span-7", ratio: "aspect-[16/10]" },
-  { slug: "europe",    name: "Iceland",   region: "North Atlantic",       tagline: "Fog, fjord, fire.",                img: iceland,   span: "md:col-span-5", ratio: "aspect-[4/5]" },
-  { slug: "morocco",   name: "Morocco",   region: "Marrakech to Atlas",   tagline: "Clay, shadow, ochre.",             img: morocco,   span: "md:col-span-12", ratio: "aspect-[21/9]" },
+  { slug: "kashmir", name: "Kashmir", region: "India · Himalayas", tagline: "Houseboats and slow water.", img: kashmir },
+  { slug: "japan", name: "Japan", region: "Honshu", tagline: "A study in stillness.", img: kyoto },
+  { slug: "goa", name: "Goa", region: "Konkan coast", tagline: "Salt, palms, slow Sundays.", img: goa },
+  { slug: "rajasthan", name: "Rajasthan", region: "Pink City & beyond", tagline: "Light through carved sandstone.", img: rajasthan },
+  { slug: "bali", name: "Bali", region: "Ubud highlands", tagline: "Terraces wrapped in fog.", img: bali },
+  { slug: "kerala", name: "Kerala", region: "Backwaters", tagline: "A morning that lasts all day.", img: kerala },
+  { slug: "ladakh", name: "Ladakh", region: "High Himalaya", tagline: "Where the road simply stops.", img: ladakh },
+  { slug: "europe", name: "Iceland", region: "North Atlantic", tagline: "Fog, fjord, fire.", img: iceland },
+  { slug: "morocco", name: "Morocco", region: "Marrakech to Atlas", tagline: "Clay, shadow, ochre.", img: morocco },
 ];
+
+const REGIONS = [
+  { id: "india", label: "India" },
+  { id: "asia", label: "Asia" },
+  { id: "europe", label: "Europe" },
+  { id: "americas", label: "Americas" },
+  { id: "africa", label: "Africa" },
+  { id: "oceania", label: "Oceania" },
+] as const;
+
+const DESTINATION_META: Record<string, { country: string; regionId: string }> = {
+  kashmir: { country: "India", regionId: "india" },
+  japan: { country: "Japan", regionId: "asia" },
+  goa: { country: "India", regionId: "india" },
+  rajasthan: { country: "India", regionId: "india" },
+  bali: { country: "Indonesia", regionId: "asia" },
+  kerala: { country: "India", regionId: "india" },
+  ladakh: { country: "India", regionId: "india" },
+  europe: { country: "Iceland", regionId: "europe" },
+  morocco: { country: "Morocco", regionId: "africa" },
+};
+
+const STEPS = 8;
 
 function DestinationPage() {
   const navigate = useNavigate();
   const { state, patch, createDraft, bookId, saveStatus } = useStudio();
-  const destIds = useDestinationIds();
+  useDestinationIds();
+
+  const [query, setQuery] = useState("");
+  const [activeRegion, setActiveRegion] = useState("india");
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+
+  const filteredDestinations = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    return destinations.filter((d) => {
+      const meta = DESTINATION_META[d.slug];
+      if (activeRegion && meta?.regionId !== activeRegion) return false;
+      if (!q) return true;
+      return (
+        d.name.toLowerCase().includes(q) ||
+        d.region.toLowerCase().includes(q) ||
+        d.tagline.toLowerCase().includes(q) ||
+        (meta?.country.toLowerCase().includes(q) ?? false)
+      );
+    });
+  }, [query, activeRegion]);
 
   const pick = async (d: D) => {
-    const { img: _i, span: _s, ratio: _r, ...rest } = d;
+    setSelectedSlug(d.slug);
+    const { img: _i, ...rest } = d;
     patch({ destination: rest, cover: undefined });
     if (!bookId) {
       try {
@@ -60,47 +104,203 @@ function DestinationPage() {
   return (
     <StudioShell current="/destination">
       <SaveIndicator status={saveStatus} />
-      <section className="container-edit pt-24 md:pt-32 pb-16">
-        <div className="grid md:grid-cols-12 gap-10 items-end">
-          <div className="md:col-span-8">
-            <p className="eyebrow">Step One · The Place</p>
-            <h1 className="display mt-6 text-5xl md:text-7xl lg:text-[5.5rem]">
-              An atlas, not<br /><span className="italic">a menu.</span>
-            </h1>
+
+      {/* 1. Progress Indicator */}
+      <div className="container-edit pt-8 md:pt-12 pb-4">
+        <div className="flex items-center gap-0.5">
+          {Array.from({ length: STEPS }, (_, i) => (
+            <div key={i} className="flex items-center flex-1">
+              <div
+                className={`w-2 h-2 rounded-full shrink-0 ${
+                  i === 0 ? "bg-foreground" : "bg-border"
+                }`}
+              />
+              {i < STEPS - 1 && (
+                <div
+                  className={`h-px flex-1 ${
+                    i === 0 ? "bg-foreground/40" : "bg-border"
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-between mt-2 text-[0.6rem] uppercase tracking-[0.28em] text-muted-foreground">
+          <span className="text-foreground font-medium">01 · Destination</span>
+          <span>02 · Edition</span>
+          <span className="hidden sm:inline">03 · Cover</span>
+          <span className="hidden md:inline">04 · Material</span>
+          <span className="hidden lg:inline">05 · Paper</span>
+          <span className="hidden lg:inline">06 · Pages</span>
+          <span className="hidden xl:inline">07 · Photographs</span>
+          <span className="hidden xl:inline">08 · Preview</span>
+        </div>
+      </div>
+
+      {/* 2. Main Heading */}
+      <section className="container-edit pt-4 pb-8 md:pb-12">
+        <h1 className="display text-4xl md:text-6xl lg:text-7xl max-w-4xl leading-[1.08] tracking-tight">
+          Every unforgettable book<br />
+          <span className="italic font-light">begins with a destination.</span>
+        </h1>
+        <p className="mt-6 max-w-xl text-muted-foreground leading-relaxed text-base md:text-lg">
+          Choose a place you'd like to live with. New destinations are added each season, set
+          in conversation with photographers who know the land.
+        </p>
+      </section>
+
+      {/* 3. Search */}
+      <section className="container-edit pb-8 md:pb-12">
+        <div className="max-w-xl mx-auto">
+          <div className="relative">
+            <svg
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            >
+              <circle cx="7" cy="7" r="5.5" />
+              <path d="M11 11l3.5 3.5" />
+            </svg>
+            <input
+              type="search"
+              placeholder="Search destinations..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 bg-transparent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-foreground/40 transition-colors"
+            />
           </div>
-          <p className="md:col-span-4 text-muted-foreground leading-relaxed">
-            Choose the place you'd like to live with. New destinations are added each season, set in
-            conversation with photographers who know the land.
-          </p>
         </div>
       </section>
 
-      <section className="container-edit pb-32 md:pb-48">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-          {destinations.map((d, i) => (
-            <button
-              key={d.slug}
-              onClick={() => pick(d)}
-              className={`group relative text-left col-span-1 ${d.span ?? "md:col-span-6"} ${i % 3 === 1 ? "md:mt-12" : ""}`}
-            >
-              <div className={`img-zoom relative ${d.ratio} overflow-hidden book-shadow`}>
-                <img src={d.img} alt={`${d.name} — ${d.tagline}`} loading="lazy" width={1600} height={1200} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink/55" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 text-background">
-                  <p className="eyebrow !text-background/75">{d.region}</p>
-                  <h3 className="font-serif text-4xl md:text-6xl mt-3 tracking-tight">{d.name}</h3>
-                  <p className="italic text-background/85 mt-2 text-lg">{d.tagline}</p>
+      {/* 4. Region Navigation */}
+      <div className="container-edit pb-8 md:pb-12">
+        <nav className="flex flex-wrap items-center justify-center gap-1 md:gap-2">
+          {REGIONS.map((region) => {
+            const hasDestinations = destinations.some(
+              (d) => DESTINATION_META[d.slug]?.regionId === region.id
+            );
+            const isActive = activeRegion === region.id;
+            return (
+              <button
+                key={region.id}
+                onClick={() => setActiveRegion(region.id)}
+                disabled={!hasDestinations}
+                className={`px-5 py-2 text-[0.7rem] uppercase tracking-[0.2em] rounded-full border transition-colors ${
+                  isActive
+                    ? "bg-foreground text-background border-foreground"
+                    : hasDestinations
+                    ? "bg-transparent text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground"
+                    : "bg-transparent text-muted-foreground/30 border-border/50 cursor-not-allowed"
+                }`}
+              >
+                {region.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* 5 + 6. Destination Grid + Cards */}
+      <section className="container-edit pb-20 md:pb-32">
+        {filteredDestinations.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+            {filteredDestinations.map((d) => {
+              const meta = DESTINATION_META[d.slug];
+              const isSelected = selectedSlug === d.slug;
+              return (
+                <button
+                  key={d.slug}
+                  onClick={() => pick(d)}
+                  className={`group relative text-left w-full transition-colors ${
+                    isSelected ? "opacity-90" : ""
+                  }`}
+                >
+                  <div
+                    className={`img-zoom relative aspect-[4/5] overflow-hidden book-shadow rounded-sm ${
+                      isSelected ? "ring-2 ring-foreground/60" : ""
+                    }`}
+                  >
+                    <img
+                      src={d.img}
+                      alt={`${d.name} — ${d.tagline}`}
+                      loading="lazy"
+                      width={1600}
+                      height={1200}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent/20 to-ink/65" />
+                    <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 lg:p-8 text-background">
+                      <p className="text-[0.6rem] uppercase tracking-[0.2em] text-background/65">
+                        {meta?.country ?? d.region}
+                      </p>
+                      <h3 className="font-serif text-2xl md:text-3xl lg:text-4xl mt-1.5 tracking-tight">
+                        {d.name}
+                      </h3>
+                      <p className="italic text-background/80 mt-1 text-sm md:text-base leading-snug">
+                        {d.tagline}
+                      </p>
+                    </div>
+                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-background/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-background"
+                      >
+                        <path d="M3 7h8M7 3v8" />
+                      </svg>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground italic">
+              {query
+                ? `No destinations match "${query}".`
+                : "No destinations in this region yet."}
+            </p>
+            <p className="text-muted-foreground/60 text-sm mt-2">
+              More chapters being written.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* 7. Bottom Inspiration */}
+      <section className="bg-beige/40 py-20 md:py-28">
+        <div className="container-edit">
+          <p className="eyebrow text-center">From the studio</p>
+          <h2 className="display text-3xl md:text-5xl text-center mt-4 max-w-2xl mx-auto leading-[1.1]">
+            Inspiration from<br />
+            <span className="italic">this destination</span>
+          </h2>
+          <p className="text-center text-muted-foreground text-sm mt-4 max-w-lg mx-auto">
+            Curated volumes, pairings and stories from our community of travellers.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-14">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="space-y-4">
+                <div className="aspect-[4/3] bg-border/40 rounded-sm" />
+                <div className="space-y-2">
+                  <div className="h-3 w-2/3 bg-border/30 rounded" />
+                  <div className="h-2.5 w-1/2 bg-border/20 rounded" />
+                  <div className="h-2 w-3/4 bg-border/15 rounded" />
                 </div>
-                <span className="absolute top-6 right-6 text-background/80 eyebrow !text-background/75 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Select →
-                </span>
               </div>
-            </button>
-          ))}
+            ))}
+          </div>
         </div>
-        <p className="mt-24 text-center text-muted-foreground italic">
-          More chapters being written — Vietnam, Patagonia, Lisbon, Hokkaido.
-        </p>
       </section>
     </StudioShell>
   );
