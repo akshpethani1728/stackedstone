@@ -24,8 +24,6 @@ export const Route = createFileRoute("/destination")({
   component: DestinationPage,
 });
 
-const STEPS = 8;
-
 type InspirationBook = {
   id: number;
   title: string;
@@ -132,39 +130,7 @@ function DestinationPage() {
     <StudioShell current="/destination">
       <SaveIndicator status={saveStatus} />
 
-      {/* 1. Progress Indicator */}
-      <div className="container-edit pt-8 md:pt-12 pb-4">
-        <div className="flex items-center gap-0.5">
-          {Array.from({ length: STEPS }, (_, i) => (
-            <div key={i} className="flex items-center flex-1">
-              <div
-                className={`w-2 h-2 rounded-full shrink-0 transition-colors duration-500 ${
-                  i === 0 ? "bg-foreground" : "bg-border"
-                }`}
-              />
-              {i < STEPS - 1 && (
-                <div
-                  className={`h-px flex-1 transition-colors duration-500 ${
-                    i === 0 ? "bg-foreground/40" : "bg-border"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-between mt-2 text-[0.6rem] uppercase tracking-[0.28em] text-muted-foreground">
-          <span className="text-foreground font-medium">01 · Destination</span>
-          <span>02 · Edition</span>
-          <span className="hidden sm:inline">03 · Cover</span>
-          <span className="hidden md:inline">04 · Material</span>
-          <span className="hidden lg:inline">05 · Paper</span>
-          <span className="hidden lg:inline">06 · Pages</span>
-          <span className="hidden xl:inline">07 · Photographs</span>
-          <span className="hidden xl:inline">08 · Preview</span>
-        </div>
-      </div>
-
-      {/* 2. Main Heading — Emotional reframe */}
+      {/* 1. Main Heading — Emotional reframe */}
       <section className="container-edit pt-4 pb-10 md:pb-12">
         <h1 className="display text-4xl md:text-6xl lg:text-7xl max-w-4xl leading-[1.08] tracking-tight">
           Your best memories deserve<br />
@@ -179,7 +145,7 @@ function DestinationPage() {
         </p>
       </section>
 
-      {/* 3. Trust Bar — Social proof */}
+      {/* 2. Trust Bar — Social proof */}
       <div className="container-edit pb-8 md:pb-10">
         <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground/60">
           <span className="flex items-center gap-2">
@@ -197,7 +163,7 @@ function DestinationPage() {
         </div>
       </div>
 
-      {/* 4. India Collection Showcase */}
+      {/* 3. India Collection Showcase */}
       <section className="container-edit pb-10 md:pb-14">
         <div className="bg-beige/60 rounded-xl p-6 md:p-10 lg:p-12">
           <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10 mb-8">
@@ -264,7 +230,7 @@ function DestinationPage() {
         </div>
       </section>
 
-      {/* 5. Search — welcoming discovery */}
+      {/* 4. Search — welcoming discovery */}
       <section className="container-edit pb-6 md:pb-8">
         <div className="max-w-xl mx-auto">
           <div className="relative group">
@@ -317,7 +283,7 @@ function DestinationPage() {
         </div>
       </section>
 
-      {/* 6. Region Navigation */}
+      {/* 5. Region Navigation */}
       <div className="container-edit pb-8 md:pb-12">
         <nav className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2">
           {REGIONS.map((region) => {
@@ -358,7 +324,7 @@ function DestinationPage() {
         </nav>
       </div>
 
-      {/* 7. Destination Grid + Cards */}
+      {/* 6. Destination Grid + Cards */}
       <section className="container-edit pb-20 md:pb-32">
         {filteredDestinations.length > 0 ? (
           <>
@@ -495,7 +461,7 @@ function DestinationPage() {
         )}
       </section>
 
-      {/* 8. Inspiration Section — Dynamic & region-aware */}
+      {/* 7. Inspiration Section — Dynamic & region-aware */}
       <section className="bg-beige/40 py-20 md:py-28">
         <div className="container-edit">
           <p className="eyebrow text-center">From the studio</p>
@@ -558,7 +524,7 @@ function DestinationPage() {
         </div>
       </section>
 
-      {/* 9. How It Works */}
+      {/* 8. How It Works */}
       <section className="py-20 md:py-28 border-t border-border/40">
         <div className="container-edit">
           <p className="eyebrow text-center">The process</p>
@@ -586,7 +552,7 @@ function DestinationPage() {
         </div>
       </section>
 
-      {/* 10. Trust & Payment Footer */}
+      {/* 9. Trust & Payment Footer */}
       <section className="border-t border-border/40 py-10 md:py-12">
         <div className="container-edit">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[0.55rem] uppercase tracking-[0.22em] text-muted-foreground/50 font-sans">
