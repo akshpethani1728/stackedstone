@@ -123,17 +123,17 @@ export function coversFor(slug?: string): Cover[] {
 }
 
 export const materials: Material[] = [
-  { slug: "classic", name: "Classic Hardcover", feel: "Smooth, slightly cool to the touch.", description: "Cloth-wrapped board with a matte print finish. Quiet, archival, dependable.", priceDelta: 0, swatch: "#e7e2d6", texture: shelf1 },
-  { slug: "linen", name: "Linen Bound", feel: "Open weave, gentle texture under the thumb.", description: "European linen wrapped over rigid board, debossed by hand for the title and spine.", priceDelta: 1490, swatch: "#c7bca6", texture: craftPaper },
-  { slug: "matte", name: "Premium Matte", feel: "Velvety, almost chalky.", description: "A fine matte lamination across photographic board. Resists glare, holds shadow.", priceDelta: 990, swatch: "#3a3530", texture: shelf2 },
-  { slug: "soft-touch", name: "Soft Touch", feel: "Suede-like. A surprise the first time.", description: "An extraordinary tactile coating that softens light and invites a second look.", priceDelta: 1690, swatch: "#1f1d1b", texture: shelf1 },
+  { slug: "hardcover", name: "Classic Hardcover", feel: "Rigid board wrapped in cloth. The standard for keepsake books.", description: "A sturdy cloth-bound hardcover with matte finish. Printed in India on archival-quality materials. Built to last a lifetime.", priceDelta: 0, swatch: "#e7e2d6", texture: shelf1 },
+  { slug: "premium-hardcover", name: "Premium Hardcover", feel: "Thick board with a lay-flat spine. Opens completely.", description: "Reinforced binding that lies perfectly flat when open. Ideal for panoramic spreads across both pages. Popular among Indian photographers.", priceDelta: 1490, swatch: "#c7bca6", texture: craftPaper },
+  { slug: "softcover", name: "Softcover", feel: "Flexible matte cover. Lightweight and portable.", description: "A durable matte laminate cover with a flexible spine. Perfect for travel journals, everyday albums, and gift volumes.", priceDelta: 0, swatch: "#3a3530", texture: shelf2 },
+  { slug: "spiral", name: "Spiral Bound", feel: "Metal wire binding. Lies flat on any page you open.", description: "Wire-O binding lets every spread open completely flat. Great for reference books, cookbooks, and presentation portfolios.", priceDelta: 690, swatch: "#1f1d1b", texture: shelf1 },
 ];
 
 export const papers: Paper[] = [
-  { slug: "premium-matte", name: "Premium Matte", weight: "170 gsm", finish: "Smooth, low-glare", bestFor: "Honest light, candid portraits.", priceDelta: 0, texture: craftPaper },
-  { slug: "silk", name: "Silk", weight: "200 gsm", finish: "Subtle satin sheen", bestFor: "Architecture, interiors, the long horizon.", priceDelta: 790, texture: shelf2 },
-  { slug: "lustre", name: "Lustre", weight: "230 gsm", finish: "Deep blacks, gentle gloss", bestFor: "Nightscapes, food, anything you want to hold.", priceDelta: 1290, texture: shelf1 },
-  { slug: "fine-art", name: "Fine Art Cotton", weight: "270 gsm cotton", finish: "Uncoated, museum-grade", bestFor: "Black & white, fine grain, archival commissions.", priceDelta: 1990, texture: craftPaper },
+  { slug: "standard-matte", name: "Standard Matte", weight: "170 gsm", finish: "Smooth, non-reflective", bestFor: "Everyday photo books, natural light portraits, family albums.", priceDelta: 0, texture: craftPaper },
+  { slug: "standard-glossy", name: "Standard Glossy", weight: "200 gsm", finish: "Bright, subtle sheen", bestFor: "Vibrant landscapes, travel photography, colourful events.", priceDelta: 790, texture: shelf2 },
+  { slug: "premium-matte", name: "Premium Matte", weight: "230 gsm", finish: "Velvety, deep blacks", bestFor: "Black & white photography, fine art prints, archival volumes.", priceDelta: 1290, texture: shelf1 },
+  { slug: "premium-glossy", name: "Premium Glossy", weight: "250 gsm", finish: "High gloss, vivid colour", bestFor: "Coffee table books, portfolio presentations, professional portfolios.", priceDelta: 1690, texture: craftPaper },
 ];
 
 export const pageCounts: PageCount[] = [

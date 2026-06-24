@@ -49,7 +49,7 @@ export function UploadDropzone({ onFiles, disabled, maxPhotos = 150, currentCoun
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif"
+        accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif,.bmp,.tiff,.tif"
         multiple
         className="hidden"
         onChange={handleChange}
@@ -70,7 +70,7 @@ export function UploadDropzone({ onFiles, disabled, maxPhotos = 150, currentCoun
         <p className="eyebrow mt-6 text-muted-foreground">
           {disabled
             ? `${maxPhotos} photo limit`
-            : `JPEG · PNG · HEIC · ${remaining} of ${maxPhotos} remaining`}
+            : `JPEG · PNG · WebP · HEIC · ${remaining} of ${maxPhotos} remaining`}
         </p>
       </div>
     </div>

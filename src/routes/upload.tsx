@@ -265,7 +265,7 @@ function UploadPage() {
         <input
           ref={replaceInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif"
+          accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif,.bmp,.tiff,.tif"
           className="hidden"
           onChange={handleReplaceFile}
         />
