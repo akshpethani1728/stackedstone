@@ -100,14 +100,28 @@ export function useStudio() {
   }, [scheduleSave]);
 
   const createDraft = useCallback(async () => {
-    const user = await AuthService.requireAuth();
-    const book = await BookService.create(user.id);
-    setActiveBookId(book.id);
-    setBookId(book.id);
-    const fresh: StudioState = { ...empty, bookId: book.id };
+    let user;
+    try {
+      user = await AuthService.getUser();
+    } catch {
+      user = null;
+    }
+    if (user) {
+      const book = await BookService.create(user.id);
+      setActiveBookId(book.id);
+      setBookId(book.id);
+      const fresh: StudioState = { ...empty, bookId: book.id };
+      writeCache(fresh);
+      setState(fresh);
+      return book.id;
+    }
+    const localId = `local_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    setActiveBookId(localId);
+    setBookId(localId);
+    const fresh: StudioState = { ...empty, bookId: localId };
     writeCache(fresh);
     setState(fresh);
-    return book.id;
+    return localId;
   }, []);
 
   const loadDraft = useCallback(async (id: string) => {

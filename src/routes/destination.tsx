@@ -4,16 +4,8 @@ import { StudioShell } from "@/components/studio/StudioShell";
 import { useStudio } from "@/stores/studio";
 import { useDestinationIds } from "@/hooks/use-catalogue-ids";
 import { SaveIndicator } from "@/components/studio/SaveIndicator";
-import type { Destination } from "@/types";
-import bali from "@/assets/dest-bali.jpg";
-import kashmir from "@/assets/dest-kashmir.jpg";
-import goa from "@/assets/dest-goa.jpg";
-import rajasthan from "@/assets/dest-rajasthan.jpg";
-import kerala from "@/assets/dest-kerala.jpg";
-import ladakh from "@/assets/dest-ladakh.jpg";
-import iceland from "@/assets/book-iceland.jpg";
-import kyoto from "@/assets/book-kyoto.jpg";
-import morocco from "@/assets/book-morocco.jpg";
+import { destinations, REGIONS, getDestination } from "@/data/destination-catalogue";
+import type { CatalogueDestination } from "@/data/destination-catalogue";
 
 export const Route = createFileRoute("/destination")({
   head: () => ({
@@ -24,41 +16,6 @@ export const Route = createFileRoute("/destination")({
   }),
   component: DestinationPage,
 });
-
-type D = Destination & { img: string };
-
-const destinations: D[] = [
-  { slug: "kashmir", name: "Kashmir", region: "India · Himalayas", tagline: "Houseboats and slow water.", img: kashmir },
-  { slug: "japan", name: "Japan", region: "Honshu", tagline: "A study in stillness.", img: kyoto },
-  { slug: "goa", name: "Goa", region: "Konkan coast", tagline: "Salt, palms, slow Sundays.", img: goa },
-  { slug: "rajasthan", name: "Rajasthan", region: "Pink City & beyond", tagline: "Light through carved sandstone.", img: rajasthan },
-  { slug: "bali", name: "Bali", region: "Ubud highlands", tagline: "Terraces wrapped in fog.", img: bali },
-  { slug: "kerala", name: "Kerala", region: "Backwaters", tagline: "A morning that lasts all day.", img: kerala },
-  { slug: "ladakh", name: "Ladakh", region: "High Himalaya", tagline: "Where the road simply stops.", img: ladakh },
-  { slug: "europe", name: "Iceland", region: "North Atlantic", tagline: "Fog, fjord, fire.", img: iceland },
-  { slug: "morocco", name: "Morocco", region: "Marrakech to Atlas", tagline: "Clay, shadow, ochre.", img: morocco },
-];
-
-const REGIONS = [
-  { id: "india", label: "India" },
-  { id: "asia", label: "Asia" },
-  { id: "europe", label: "Europe" },
-  { id: "americas", label: "Americas" },
-  { id: "africa", label: "Africa" },
-  { id: "oceania", label: "Oceania" },
-] as const;
-
-const DESTINATION_META: Record<string, { country: string; regionId: string }> = {
-  kashmir: { country: "India", regionId: "india" },
-  japan: { country: "Japan", regionId: "asia" },
-  goa: { country: "India", regionId: "india" },
-  rajasthan: { country: "India", regionId: "india" },
-  bali: { country: "Indonesia", regionId: "asia" },
-  kerala: { country: "India", regionId: "india" },
-  ladakh: { country: "India", regionId: "india" },
-  europe: { country: "Iceland", regionId: "europe" },
-  morocco: { country: "Morocco", regionId: "africa" },
-};
 
 const STEPS = 8;
 
@@ -73,30 +30,34 @@ function DestinationPage() {
 
   const filteredDestinations = useMemo(() => {
     const q = query.toLowerCase().trim();
+    if (!q && !activeRegion) return destinations;
     return destinations.filter((d) => {
-      const meta = DESTINATION_META[d.slug];
-      if (activeRegion && meta?.regionId !== activeRegion) return false;
+      if (activeRegion && d.regionId !== activeRegion) return false;
       if (!q) return true;
       return (
         d.name.toLowerCase().includes(q) ||
-        d.region.toLowerCase().includes(q) ||
-        d.tagline.toLowerCase().includes(q) ||
-        (meta?.country.toLowerCase().includes(q) ?? false)
+        d.country.toLowerCase().includes(q) ||
+        d.subtitle.toLowerCase().includes(q) ||
+        d.description.toLowerCase().includes(q) ||
+        d.searchKeywords.some((kw) => kw.toLowerCase().includes(q))
       );
     });
   }, [query, activeRegion]);
 
-  const pick = async (d: D) => {
+  const pick = async (d: CatalogueDestination) => {
     setSelectedSlug(d.slug);
-    const { img: _i, ...rest } = d;
-    patch({ destination: rest, cover: undefined });
+    const { img: _i, searchKeywords: _sk, featured: _f, bookCount: _bc, ...catalog } = d;
+    patch({
+      destination: {
+        slug: d.slug,
+        name: d.name,
+        region: d.country,
+        tagline: d.subtitle,
+      },
+      cover: undefined,
+    });
     if (!bookId) {
-      try {
-        await createDraft();
-      } catch {
-        navigate({ to: "/login", search: { redirect: "/destination" } });
-        return;
-      }
+      await createDraft();
     }
     navigate({ to: "/create" });
   };
@@ -180,7 +141,7 @@ function DestinationPage() {
         <nav className="flex flex-wrap items-center justify-center gap-1 md:gap-2">
           {REGIONS.map((region) => {
             const hasDestinations = destinations.some(
-              (d) => DESTINATION_META[d.slug]?.regionId === region.id
+              (d) => d.regionId === region.id
             );
             const isActive = activeRegion === region.id;
             return (
@@ -208,7 +169,6 @@ function DestinationPage() {
         {filteredDestinations.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
             {filteredDestinations.map((d) => {
-              const meta = DESTINATION_META[d.slug];
               const isSelected = selectedSlug === d.slug;
               return (
                 <button
@@ -225,7 +185,7 @@ function DestinationPage() {
                   >
                     <img
                       src={d.img}
-                      alt={`${d.name} — ${d.tagline}`}
+                      alt={`${d.name} — ${d.subtitle}`}
                       loading="lazy"
                       width={1600}
                       height={1200}
@@ -234,13 +194,13 @@ function DestinationPage() {
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent/20 to-ink/65" />
                     <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 lg:p-8 text-background">
                       <p className="text-[0.6rem] uppercase tracking-[0.2em] text-background/65">
-                        {meta?.country ?? d.region}
+                        {d.country}
                       </p>
                       <h3 className="font-serif text-2xl md:text-3xl lg:text-4xl mt-1.5 tracking-tight">
                         {d.name}
                       </h3>
                       <p className="italic text-background/80 mt-1 text-sm md:text-base leading-snug">
-                        {d.tagline}
+                        {d.subtitle}
                       </p>
                     </div>
                     <div className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-background/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
