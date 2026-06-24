@@ -75,15 +75,47 @@ export const coverCollections: Record<string, Cover[]> = {
   ],
   morocco: [
     { slug: "medina",        name: "Medina",         mood: "Lantern-lit labyrinth",           ink: "#f3e3cd", panel: "rgba(58,31,16,0.6)",       image: morocco },
-    { slug: "atlas-clay",    name: "Atlas Clay",     mood: "Earth walls the colour of hill",  ink: "#3a1f10", panel: "rgba(243,227,205,0.78)",   image: morocco },
-    { slug: "tile",          name: "Tile",           mood: "Cobalt and bone, repeated",       ink: "#f3e3cd", panel: "rgba(30,60,90,0.6)",       image: iceland },
-    { slug: "ochre",         name: "Ochre",          mood: "A wall in late afternoon",        ink: "#3a1f10", panel: "rgba(220,165,90,0.65)",    image: rajasthan },
+    { slug: "atlas-clay",    name: "Atlas Clay",      mood: "Earth walls the colour of hill",  ink: "#3a1f10", panel: "rgba(243,227,205,0.78)",   image: morocco },
+    { slug: "tile",          name: "Tile",            mood: "Cobalt and bone, repeated",       ink: "#f3e3cd", panel: "rgba(30,60,90,0.6)",       image: iceland },
+    { slug: "ochre",         name: "Ochre",           mood: "A wall in late afternoon",        ink: "#3a1f10", panel: "rgba(220,165,90,0.65)",    image: rajasthan },
   ],
+  himalayas: [
+    { slug: "pine-mist",     name: "Pine & Mist",     mood: "Deodar trees dissolving into fog", ink: "#eef0e6", panel: "rgba(28,38,28,0.6)",      image: ladakh },
+    { slug: "mountain-snow", name: "Mountain Snow",    mood: "White ridge against pale sky",     ink: "#22241d", panel: "rgba(240,238,230,0.8)",   image: kashmir },
+    { slug: "valley-green",  name: "Valley Green",     mood: "Summer in the high meadows",      ink: "#1c2a23", panel: "rgba(232,240,226,0.7)",   image: kerala },
+    { slug: "stream",        name: "Stream",           mood: "Clear water over round stone",    ink: "#22241d", panel: "rgba(240,238,230,0.65)",  image: goa },
+  ],
+  mumbai: [
+    { slug: "city-light",    name: "City Light",      mood: "Neon rain on Marine Drive",       ink: "#f0ece3", panel: "rgba(16,18,24,0.6)",      image: iceland },
+    { slug: "colonial",      name: "Colonial",         mood: "Custard-yellow, sea breeze",      ink: "#2c221a", panel: "rgba(242,232,216,0.78)",  image: morocco },
+    { slug: "monsoon",       name: "Monsoon",          mood: "Wet asphalt, warm chai",           ink: "#f0ece3", panel: "rgba(28,31,35,0.55)",     image: kyoto },
+    { slug: "bazaar",        name: "Bazaar",           mood: "Spice, colour, crowd",            ink: "#2c221a", panel: "rgba(242,225,200,0.7)",   image: rajasthan },
+  ],
+  delhi: [
+    { slug: "heritage",      name: "Heritage",         mood: "Red sandstone, old city",          ink: "#f5ebe0", panel: "rgba(54,28,16,0.6)",      image: rajasthan },
+    { slug: "garden",        name: "Garden",            mood: "Lodi in the spring",              ink: "#1f2a1d", panel: "rgba(236,240,228,0.78)",  image: kerala },
+    { slug: "night",         name: "Night",             mood: "Connaught Place after dark",       ink: "#f5ebe0", panel: "rgba(14,16,20,0.6)",      image: iceland },
+    { slug: "minimal-earth", name: "Minimal Earth",     mood: "Clay, dust, resilience",          ink: "#361c10", panel: "rgba(245,235,224,0.85)",  image: shelf2 },
+  ],
+  northeast: [
+    { slug: "tea-garden",    name: "Tea Garden",       mood: "Green terraces in the rain",       ink: "#1c2a1e", panel: "rgba(234,242,230,0.78)",  image: kerala },
+    { slug: "hill-station",  name: "Hill Station",      mood: "Fog on a winding road",           ink: "#eef0e6", panel: "rgba(28,34,30,0.6)",      image: ladakh },
+    { slug: "tribal",        name: "Tribal",            mood: "Weave, bone, earth",              ink: "#2c221a", panel: "rgba(240,232,216,0.7)",   image: morocco },
+    { slug: "monastery-gold",name: "Monastery Gold",    mood: "Gilded roof at sunrise",          ink: "#1c2a1e", panel: "rgba(240,235,200,0.7)",   image: goa },
+  ],
+};
+
+const collectionAliases: Record<string, string> = {
+  himachal: "himalayas", uttarakhand: "himalayas", manali: "himalayas", rishikesh: "himalayas",
+  mumbai: "mumbai",
+  delhi: "delhi", agra: "delhi",
+  sikkim: "northeast", darjeeling: "northeast", meghalaya: "northeast", assam: "northeast",
 };
 
 export function coversFor(slug?: string): Cover[] {
   if (!slug) return [];
-  return coverCollections[slug] ?? [
+  const collectionKey = collectionAliases[slug] ?? slug;
+  return coverCollections[collectionKey] ?? [
     { slug: "minimal",   name: "Minimal",      mood: "Paper, ink, restraint",  ink: "#1d1c1a", panel: "rgba(248,244,238,0.85)", image: coverArt[slug] ?? shelf1 },
     { slug: "editorial", name: "Editorial",    mood: "Photographic, full bleed", ink: "#f6ecdc", panel: "rgba(20,18,16,0.5)",     image: coverArt[slug] ?? shelf2 },
     { slug: "panel",     name: "Panel",        mood: "Half image, half quiet",  ink: "#1d1c1a", panel: "rgba(238,232,220,0.85)", image: coverArt[slug] ?? shelf1 },
